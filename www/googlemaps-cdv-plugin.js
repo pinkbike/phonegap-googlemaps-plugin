@@ -954,7 +954,7 @@ App.prototype.addPolyline = function(polylineOptions, callback) {
   polylineOptions.zIndex = polylineOptions.zIndex || 4;
   polylineOptions.geodesic = polylineOptions.geodesic || false;
   console.log("color = " + polylineOptions.color.join(", "));
-  
+
   cordova.exec(function(result) {
     var polyline = new Polyline(self, result.id, polylineOptions);
     OVERLAYS[result.id] = polyline;
@@ -966,6 +966,65 @@ App.prototype.addPolyline = function(polylineOptions, callback) {
     }
   }, self.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.createPolyline', polylineOptions]);
 };
+
+App.prototype.addPolylines = function(polylineOptionsArray, callback) {
+  var self = this;
+
+  for (var i = 0; i < polylineOptionsArray.length; i++) {
+    var polylineOptions = polylineOptionsArray[i];
+    polylineOptions.points      = polylineOptions.points || [];
+    polylineOptions.color       = HTMLColor2RGBA(polylineOptions.color || "#FF000080", 0.75);
+    polylineOptions.width       = polylineOptions.width || 10;
+    polylineOptions.visible     = polylineOptions.visible === undefined ? true : polylineOptions.visible;
+    polylineOptions.zIndex      = polylineOptions.zIndex || 4;
+    polylineOptions.geodesic    = polylineOptions.geodesic || false;
+  }
+
+  cordova.exec(function(results) {
+    var polylines = [];
+    for (var i = 0; i < results.length; i++) {
+      var polyline = new Polyline(self, results[i].id, polylineOptionsArray[i]);
+      OVERLAYS[results[i].id] = polyline;
+      polylines.push(polyline);
+    }
+    if (typeof callback === "function") {
+      callback.call(self,  polylines, self);
+    }
+
+  }, self.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.createPolylines', polylineOptionsArray]);
+};
+
+App.prototype.addPolylinesJS = function(polylineOptionsArray, callback) {
+  var self = this;
+
+  var polylines = [];
+  var index = 0;
+
+  next();
+
+  function next() {
+    var polylineOptions = polylineOptionsArray[index];
+    index++;
+
+    if (polylineOptions) {
+      self.addPolyline(polylineOptions, function(polyline) {
+        polylines.push(polyline);
+        next();
+      });
+    }
+    else {
+      done();
+    }
+  }
+
+  function done() {
+    if (typeof callback === "function") {
+      callback.call(self,  polylines, self);
+    }
+  }
+}
+
+
 //-------------
 // Polygon
 //-------------
