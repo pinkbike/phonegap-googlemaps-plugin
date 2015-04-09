@@ -15,15 +15,70 @@
   self.mapCtrl = viewCtrl;
 }
 
+-(GMSMutablePath *)decodePoly:(NSString *)encodedString
+{
+  // http://stackoverflow.com/questions/9217274/how-to-decode-the-google-directions-api-polylines-field-into-lat-long-points-in
+
+  GMSMutablePath *path = [GMSMutablePath path];
+
+  const char *bytes = [encodedString UTF8String];
+  NSUInteger length = [encodedString lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+  NSUInteger idx = 0;
+
+  float latitude = 0;
+  float longitude = 0;
+  while (idx < length) {
+    char byte = 0;
+    int res = 0;
+    char shift = 0;
+
+    do {
+      byte = bytes[idx++] - 63;
+      res |= (byte & 0x1F) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+
+    float deltaLat = ((res & 1) ? ~(res >> 1) : (res >> 1));
+    latitude += deltaLat;
+
+    shift = 0;
+    res = 0;
+
+    do {
+      byte = bytes[idx++] - 0x3F;
+      res |= (byte & 0x1F) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+
+    float deltaLon = ((res & 1) ? ~(res >> 1) : (res >> 1));
+    longitude += deltaLon;
+
+    float finalLat = latitude * 1E-5;
+    float finalLon = longitude * 1E-5;
+
+    [path addCoordinate:CLLocationCoordinate2DMake(finalLat, finalLon)];
+  }
+
+  return path;
+}
+
 -(NSMutableDictionary *)buildPolyline:(NSDictionary *)json
 {
-  GMSMutablePath *path = [GMSMutablePath path];
-  NSArray *points = [json objectForKey:@"points"];
-  int i = 0;
-  NSDictionary *latLng;
-  for (i = 0; i < points.count; i++) {
-    latLng = [points objectAtIndex:i];
-    [path addCoordinate:CLLocationCoordinate2DMake([[latLng objectForKey:@"lat"] floatValue], [[latLng objectForKey:@"lng"] floatValue])];
+  GMSMutablePath *path;
+
+  NSString *encodedPath = [json objectForKey:@"encodedPath"];
+  if (encodedPath) {
+    path = [self decodePoly:[json valueForKey:@"encodedPath"]];
+  }
+  else {
+    path = [GMSMutablePath path];
+    NSArray *points = [json objectForKey:@"points"];
+    int i = 0;
+    NSDictionary *latLng;
+    for (i = 0; i < points.count; i++) {
+      latLng = [points objectAtIndex:i];
+      [path addCoordinate:CLLocationCoordinate2DMake([[latLng objectForKey:@"lat"] floatValue], [[latLng objectForKey:@"lng"] floatValue])];
+    }
   }
 
   // Create the Polyline, and assign it to the map.

@@ -947,12 +947,13 @@ App.prototype.addCircle = function(circleOptions, callback) {
 //-------------
 App.prototype.addPolyline = function(polylineOptions, callback) {
   var self = this;
-  polylineOptions.points = polylineOptions.points || [];
-  polylineOptions.color = HTMLColor2RGBA(polylineOptions.color || "#FF000080", 0.75);
-  polylineOptions.width = polylineOptions.width || 10;
-  polylineOptions.visible = polylineOptions.visible === undefined ? true : polylineOptions.visible;
-  polylineOptions.zIndex = polylineOptions.zIndex || 4;
-  polylineOptions.geodesic = polylineOptions.geodesic || false;
+  polylineOptions.encodedPath = polylineOptions.encodedPath || "";
+  polylineOptions.points      = polylineOptions.points || [];
+  polylineOptions.color       = HTMLColor2RGBA(polylineOptions.color || "#FF000080", 0.75);
+  polylineOptions.width       = polylineOptions.width || 10;
+  polylineOptions.visible     = polylineOptions.visible === undefined ? true : polylineOptions.visible;
+  polylineOptions.zIndex      = polylineOptions.zIndex || 4;
+  polylineOptions.geodesic    = polylineOptions.geodesic || false;
   console.log("color = " + polylineOptions.color.join(", "));
 
   cordova.exec(function(result) {
@@ -972,6 +973,7 @@ App.prototype.addPolylines = function(polylineOptionsArray, callback) {
 
   for (var i = 0; i < polylineOptionsArray.length; i++) {
     var polylineOptions = polylineOptionsArray[i];
+    polylineOptions.encodedPath = polylineOptions.encodedPath || "";
     polylineOptions.points      = polylineOptions.points || [];
     polylineOptions.color       = HTMLColor2RGBA(polylineOptions.color || "#FF000080", 0.75);
     polylineOptions.width       = polylineOptions.width || 10;
