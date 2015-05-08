@@ -774,4 +774,52 @@
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
+
+- (void)getOverlaysInBounds:(CDVInvokedUrlCommand*)command {
+  NSDictionary *boundsdata = [command.arguments objectAtIndex:0];
+  NSDictionary *swdata = [boundsdata objectForKey:@"southwest"];
+  NSDictionary *nedata = [boundsdata objectForKey:@"northeast"];
+
+  NSMutableDictionary *responsejson = [NSMutableDictionary dictionary];
+  //[responsejson setObject:boundsdata forKey:@"bounds"];
+  NSNumber *numMarkUps = [NSNumber numberWithUnsignedInteger:[self.mapCtrl.overlayManager count]];
+  [responsejson setObject:numMarkUps forKey:@"numMarkUpsSearched"];
+
+  NSMutableArray *boundedOverlays = [NSMutableArray array];
+
+  CLLocationCoordinate2D sw = CLLocationCoordinate2DMake([[swdata objectForKey:@"lat"] floatValue], [[swdata objectForKey:@"lng"] floatValue]);
+  CLLocationCoordinate2D ne = CLLocationCoordinate2DMake([[nedata objectForKey:@"lat"] floatValue], [[nedata objectForKey:@"lng"] floatValue]);
+  GMSCoordinateBounds *bounds = [[GMSCoordinateBounds alloc] initWithCoordinate:ne coordinate:sw];
+
+  int numPointsSearched = 0;
+  for (NSString *key in [self.mapCtrl.overlayManager allKeys]) {
+    GMSOverlay *overlay = [self.mapCtrl.overlayManager objectForKey:key];
+
+    if ([overlay isKindOfClass:[GMSPolyline class]]) {
+      GMSPolyline *polyline = overlay;
+      GMSPath *path = [polyline path];
+      NSUInteger numPoints = [path count];
+      for(int pointIndex = 0; pointIndex < numPoints; pointIndex++) {
+        numPointsSearched++;
+        CLLocationCoordinate2D coordinate=[path coordinateAtIndex:pointIndex];
+        if([bounds containsCoordinate:coordinate]) {
+          [boundedOverlays addObject:key];
+          break;
+        }
+      }
+    }
+    //else if ([overlay isKindOfClass:[GMSMarker class]]) {
+    //  GMSMarker *marker = overlay;
+    //  if ([bounds containsCoordinate:marker.position]) {
+    //    [boundedOverlays addObject:key];
+    //  }
+    //}
+  }
+  [responsejson setObject:[NSNumber numberWithInt:numPointsSearched] forKey:@"numPointsSearched"];
+  [responsejson setObject:boundedOverlays forKey:@"bounded"];
+
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:responsejson];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 @end

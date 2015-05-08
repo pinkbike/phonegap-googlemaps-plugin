@@ -41,4 +41,5 @@
 - (void)pluginLayer_pushHtmlElement:(CDVInvokedUrlCommand*)command;
 - (void)pluginLayer_removeHtmlElement:(CDVInvokedUrlCommand*)command;
 - (void)remove:(CDVInvokedUrlCommand*)command;
+- (void)getOverlaysInBounds:(CDVInvokedUrlCommand*)command;
 @end
