@@ -100,6 +100,11 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     JSONObject result = new JSONObject();
     result.put("hashCode", polyline.hashCode());
     result.put("id", id);
+
+    if (opts.has("tappable") && opts.getBoolean("tappable")) {
+      this.tappables.put(id, true);
+    }
+
     return result;
   }
 
@@ -303,6 +308,7 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
       return;
     }
     this.objects.remove(id);
+    this.tappables.remove(id);
 
     id = "polyline_bounds_" + polyline.getId();
     this.objects.remove(id);

@@ -47,7 +47,7 @@
 
   __block GroundOverlay *self_ = self;
   MYCompletionHandler callback = ^(NSError *error) {
-    
+
     if ([json valueForKey:@"opacity"]) {
       CGFloat opacity = [[json valueForKey:@"opacity"] floatValue];
       layer.icon = [layer.icon imageByApplyingAlpha:opacity];
@@ -56,7 +56,12 @@
       layer.bearing = [[json valueForKey:@"bearing"] floatValue];
     }
 
-    layer.tappable = YES;
+    if ([[json valueForKey:@"tappable"] boolValue]) {
+      layer.tappable = YES;
+    }
+    else {
+      layer.tappable = NO;
+    }
 
     NSString *id = [NSString stringWithFormat:@"groundOverlay_%lu", (unsigned long)layer.hash];
     [self_.mapCtrl.overlayManager setObject:layer forKey: id];
@@ -81,7 +86,7 @@
 - (void)_setImage:(GMSGroundOverlay *)layer urlStr:(NSString *)urlStr completionHandler:(MYCompletionHandler)completionHandler {
 
   NSString *id = [NSString stringWithFormat:@"groundOverlay_icon_%lu", (unsigned long)layer.hash];
-  
+
   NSError *error;
   NSRange range = [urlStr rangeOfString:@"://"];
   if (range.location == NSNotFound) {
@@ -93,7 +98,7 @@
       }
     }
   }
-  
+
   range = [urlStr rangeOfString:@"./"];
   if (range.location != NSNotFound) {
     NSString *currentPath = [self.webView.request.URL absoluteString];
@@ -101,7 +106,7 @@
     currentPath= [regex stringByReplacingMatchesInString:currentPath options:0 range:NSMakeRange(0, [currentPath length]) withTemplate:@""];
     urlStr = [urlStr stringByReplacingOccurrencesOfString:@"./" withString:currentPath];
   }
-  
+
   range = [urlStr rangeOfString:@"cdvfile://"];
   if (range.location != NSNotFound) {
     urlStr = [PluginUtil getAbsolutePathFromCDVFilePath:self.webView cdvFilePath:urlStr];
@@ -111,7 +116,7 @@
       error = [NSError errorWithDomain:@"world" code:200 userInfo:details];
     }
   }
-  
+
   range = [urlStr rangeOfString:@"file://"];
   if (range.location != NSNotFound) {
     urlStr = [urlStr stringByReplacingOccurrencesOfString:@"file://" withString:@""];
@@ -122,14 +127,14 @@
       error = [NSError errorWithDomain:@"world" code:200 userInfo:details];
     }
   }
-    
+
   // If there is an error, return
   if (error) {
     completionHandler(error);
     return;
   }
 
-  
+
   range = [urlStr rangeOfString:@"http://"];
   if (range.location == NSNotFound) {
     layer.icon = [UIImage imageNamed:urlStr];
@@ -177,13 +182,13 @@
   NSString *key = [command.arguments objectAtIndex:1];
   GMSGroundOverlay *layer = [self.mapCtrl getGroundOverlayByKey:key];
   Boolean isVisible = [[command.arguments objectAtIndex:2] boolValue];
-  
+
   if (isVisible) {
     layer.map = self.mapCtrl.map;
   } else {
     layer.map = nil;
   }
-  
+
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -196,7 +201,7 @@
 {
   NSString *key = [command.arguments objectAtIndex:1];
   GMSGroundOverlay *layer = [self.mapCtrl getGroundOverlayByKey:key];
-  
+
   NSString *urlStr = [command.arguments objectAtIndex:2];
   if (urlStr) {
     __block GroundOverlay *self_ = self;
@@ -205,11 +210,11 @@
       [self_.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
   } else {
-  
+
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
   }
-  
+
 }
 
 /**
@@ -243,17 +248,17 @@
  */
 -(void)setOpacity:(CDVInvokedUrlCommand *)command
 {
-  
-  
+
+
   NSString *key = [command.arguments objectAtIndex:1];
   GMSGroundOverlay *layer = [self.mapCtrl getGroundOverlayByKey:key];
   CGFloat opacity = [[command.arguments objectAtIndex:2] floatValue];
-  
+
   NSString *id = [NSString stringWithFormat:@"groundOverlay_icon_%lu", (unsigned long)layer.hash];
   UIImage *icon = [self.mapCtrl getUIImageByKey:id];
-  
+
   layer.icon = [icon imageByApplyingAlpha:opacity];
-  
+
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -267,7 +272,7 @@
   NSString *key = [command.arguments objectAtIndex:1];
   GMSGroundOverlay *layer = [self.mapCtrl getGroundOverlayByKey:key];
   layer.bearing = [[command.arguments objectAtIndex:2] floatValue];
-  
+
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -281,7 +286,7 @@
   GMSGroundOverlay *layer = [self.mapCtrl getGroundOverlayByKey:key];
   NSInteger zIndex = [[command.arguments objectAtIndex:2] integerValue];
   [layer setZIndex:(int)zIndex];
-  
+
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }

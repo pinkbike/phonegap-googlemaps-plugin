@@ -24,7 +24,7 @@ public class PluginGroundOverlay extends MyPlugin {
 
   /**
    * Create ground overlay
-   * 
+   *
    * @param args
    * @param callbackContext
    * @throws JSONException
@@ -34,7 +34,7 @@ public class PluginGroundOverlay extends MyPlugin {
     JSONObject opts = args.getJSONObject(1);
     _createGroundOverlay(opts, callbackContext);
   }
-  
+
   private void _createGroundOverlay(final JSONObject opts, final CallbackContext callbackContext) throws JSONException {
     GroundOverlayOptions options = new GroundOverlayOptions();
 
@@ -61,6 +61,8 @@ public class PluginGroundOverlay extends MyPlugin {
       options.positionFromBounds(bounds);
     }
 
+    final boolean tappable = opts.has("tappable") && opts.getBoolean("tappable");
+
     // Load image
     String url = opts.getString("url");
     _setImage(url, options, new PluginAsyncInterface() {
@@ -72,11 +74,15 @@ public class PluginGroundOverlay extends MyPlugin {
         String id = "groundOverlay_" + groundOverlay.getId();
         PluginGroundOverlay.this.objects.put(id, groundOverlay);
 
+        if (tappable) {
+          PluginGroundOverlay.this.tappables.put(id, true);
+        }
+
         JSONObject result = new JSONObject();
         try {
           result.put("hashCode", groundOverlay.hashCode());
           result.put("id", id);
-          
+
           PluginGroundOverlay.this.objects.put("gOverlay_property_" + groundOverlay.getId(), opts);
         } catch (Exception e) {}
         callbackContext.success(result);
@@ -86,7 +92,7 @@ public class PluginGroundOverlay extends MyPlugin {
       public void onError(String errorMsg) {
         callbackContext.error(errorMsg);
       }
-      
+
     });
   }
   @SuppressWarnings("resource")
@@ -97,8 +103,8 @@ public class PluginGroundOverlay extends MyPlugin {
     }
 
     String filePath = url;
-    if (filePath.indexOf("://") == -1 && 
-        filePath.startsWith("/") == false && 
+    if (filePath.indexOf("://") == -1 &&
+        filePath.startsWith("/") == false &&
         filePath.startsWith("www/") == false) {
       filePath = "./" + filePath;
     }
@@ -107,13 +113,13 @@ public class PluginGroundOverlay extends MyPlugin {
       currentPage = currentPage.replaceAll("[^\\/]*$", "");
       filePath = filePath.replace("./", currentPage);
     }
-    
-    
+
+
     //=================================
     // Load the image from the Internet
     //=================================
     if (filePath.indexOf("http") == 0) {
-      
+
       AsyncLoadImage task = new AsyncLoadImage(new AsyncLoadImageInterface() {
 
         @Override
@@ -131,12 +137,12 @@ public class PluginGroundOverlay extends MyPlugin {
             callback.onError("Can not load image from " + url);
           }
         }
-      
+
       });
       task.execute(filePath);
       return;
     }
-    
+
     InputStream inputStream;
     if (filePath.indexOf("/") == 0 ||
         (filePath.indexOf("file://") == 0 && filePath.indexOf("file:///android_asset/") == -1) ||
@@ -147,7 +153,7 @@ public class PluginGroundOverlay extends MyPlugin {
       if (filePath.indexOf("file://") == 0) {
         filePath = filePath.replace("file://", "");
       }
-      
+
       try {
         inputStream = new FileInputStream(filePath);
       } catch (FileNotFoundException e) {
@@ -168,12 +174,12 @@ public class PluginGroundOverlay extends MyPlugin {
         return;
       }
     }
-    
-    
+
+
     try {
       Bitmap image = null;
       image = BitmapFactory.decodeStream(inputStream);
-      
+
       BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(image);
       if (bitmapDescriptor != null) {
         options.image(bitmapDescriptor);
@@ -193,7 +199,7 @@ public class PluginGroundOverlay extends MyPlugin {
    * Remove this tile layer
    * @param args
    * @param callbackContext
-   * @throws JSONException 
+   * @throws JSONException
    */
   protected void remove(JSONArray args, CallbackContext callbackContext) throws JSONException {
     String id = args.getString(1);
@@ -203,8 +209,12 @@ public class PluginGroundOverlay extends MyPlugin {
       return;
     }
 
+    this.objects.remove(id);
+    this.tappables.remove(id);
+
     String propertyId = "gOverlay_property_" + id;
     this.objects.remove(propertyId);
+
     groundOverlay.remove();
     this.sendNoResult(callbackContext);
   }
@@ -213,11 +223,11 @@ public class PluginGroundOverlay extends MyPlugin {
    * Set visibility for the object
    * @param args
    * @param callbackContext
-   * @throws JSONException 
+   * @throws JSONException
    */
   protected void setVisible(JSONArray args, CallbackContext callbackContext) throws JSONException {
     boolean visible = args.getBoolean(2);
-    
+
     String id = args.getString(1);
     GroundOverlay groundOverlay = (GroundOverlay)this.objects.get(id);
     if (groundOverlay == null) {
@@ -227,27 +237,27 @@ public class PluginGroundOverlay extends MyPlugin {
     groundOverlay.setVisible(visible);
     this.sendNoResult(callbackContext);
   }
-  
+
 
   /**
    * Set image of the ground-overlay
    * @param args
    * @param callbackContext
-   * @throws JSONException 
+   * @throws JSONException
    */
   @SuppressWarnings("unused")
   private void setImage(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
     String id = args.getString(1);
     GroundOverlay groundOverlay = (GroundOverlay)this.objects.get(id);
     String url = args.getString(2);
-    
+
     String propertyId = "gOverlay_property_" + id;
     JSONObject opts = (JSONObject) this.objects.get(propertyId);
     opts.put("url", url);
-    
+
     _createGroundOverlay(opts, callbackContext);
   }
-  
+
 
   /**
    * Set bounds
@@ -259,7 +269,7 @@ public class PluginGroundOverlay extends MyPlugin {
   private void setBounds(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
     String id = args.getString(1);
     GroundOverlay groundOverlay = (GroundOverlay)this.objects.get(id);
-    
+
     JSONArray points = args.getJSONArray(2);
     LatLngBounds bounds = PluginUtil.JSONArray2LatLngBounds(points);
     groundOverlay.setPositionFromBounds(bounds);
@@ -271,7 +281,7 @@ public class PluginGroundOverlay extends MyPlugin {
    * Set opacity
    * @param args
    * @param callbackContext
-   * @throws JSONException 
+   * @throws JSONException
    */
   @SuppressWarnings("unused")
   private void setOpacity(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
@@ -283,7 +293,7 @@ public class PluginGroundOverlay extends MyPlugin {
    * Set bearing
    * @param args
    * @param callbackContext
-   * @throws JSONException 
+   * @throws JSONException
    */
   @SuppressWarnings("unused")
   private void setBearing(final JSONArray args, final CallbackContext callbackContext) throws JSONException {

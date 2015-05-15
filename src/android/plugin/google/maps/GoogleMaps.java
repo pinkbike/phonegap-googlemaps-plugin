@@ -1315,7 +1315,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
    * Notify map click event to JS, also checks for click on a polygon and triggers onPolygonEvent
    * @param point
    */
-  public void onMapClick(LatLng point) {
+  public void onMapClick(LatLng tapLatLng) {
     boolean hitPoly = false;
     String key;
     LatLngBounds bounds;
@@ -1325,41 +1325,78 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
     if(polylinePlugin != null) {
       PluginPolyline polylineClass = (PluginPolyline) polylinePlugin.plugin;
 
-      List<LatLng> points ;
+      List<LatLng> points;
+      LatLng point;
       Polyline polyline;
-      Point origin = new Point();
-      Point hitArea = new Point();
-      hitArea.x = 1;
-      hitArea.y = 1;
-      Projection projection = map.getProjection();
-      double threshold = this.calculateDistance(
-          projection.fromScreenLocation(origin),
-          projection.fromScreenLocation(hitArea));
+
+      Point tapPoint = map.getProjection().toScreenLocation(tapLatLng);
+
+      Point swPoint = new Point(tapPoint);
+      int size = (int)(20*density);
+      swPoint.offset(-size, size);
+      LatLng sw = map.getProjection().fromScreenLocation(swPoint);
+
+      Point nePoint = new Point(tapPoint);
+      nePoint.offset(size, -size);
+      LatLng ne = map.getProjection().fromScreenLocation(nePoint);
+
+      LatLngBounds tapBounds = new LatLngBounds(sw, ne);
+
+      HashMap<String, Double> matches = new HashMap<String, Double>();
+      double pointDistance;
+      double prevDistance;
 
       for (HashMap.Entry<String, Object> entry : polylineClass.objects.entrySet()) {
         key = entry.getKey();
         if (key.contains("polyline_bounds_")) {
-          bounds = (LatLngBounds) entry.getValue();
-          if (bounds.contains(point)) {
-            key = key.replace("bounds_", "");
+          key = key.replace("bounds_", "");
+          if (polylineClass.isTappable(key)) {
+            bounds = (LatLngBounds) entry.getValue();
+            if (this.isBoundsOverlaps(bounds, tapBounds) || this.isBoundsOverlaps(tapBounds, bounds)) {
 
-            polyline = polylineClass.getPolyline(key);
-            points = polyline.getPoints();
+              polyline = polylineClass.getPolyline(key);
+              points = polyline.getPoints();
 
-            if (polyline.isGeodesic()) {
-              if (this.isPointOnTheGeodesicLine(points, point, threshold)) {
-                hitPoly = true;
-                this.onPolylineClick(polyline, point);
-              }
-            } else {
-                if (this.isPointOnTheLine(points, point)) {
-                  hitPoly = true;
-                  this.onPolylineClick(polyline, point);
+              for (int i = 0; i < points.size(); i++) {
+                point = points.get(i);
+                if (tapBounds.contains(point)) {
+                  pointDistance = this.calculateDistance(tapLatLng, point);
+
+                  if (matches.containsKey(key)) {
+                    prevDistance = matches.get(key);
+                    if (pointDistance < prevDistance) {
+                      matches.put(key, pointDistance);
+                    }
+                  }
+                  else {
+                    matches.put(key, pointDistance);
+                  }
                 }
+              }
             }
           }
         }
       }
+
+      // find the closest
+      HashMap.Entry<String, Double> min = null;
+      for (HashMap.Entry<String, Double> entry : matches.entrySet()) {
+        //key = entry.getKey();
+        //polyline = polylineClass.getPolyline(key);
+        //this.onPolylineClick(polyline, tapLatLng);
+
+        if (min == null || min.getValue() > entry.getValue()) {
+          min = entry;
+        }
+      }
+
+      if (min != null) {
+        key = min.getKey();
+        polyline = polylineClass.getPolyline(key);
+        this.onPolylineClick(polyline, tapLatLng);
+        hitPoly = true;
+      }
+
       if (hitPoly) {
         return;
       }
@@ -1373,15 +1410,16 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
       for (HashMap.Entry<String, Object> entry : polygonClass.objects.entrySet()) {
         key = entry.getKey();
         if (key.contains("polygon_bounds_")) {
-          bounds = (LatLngBounds) entry.getValue();
-          if (bounds.contains(point)) {
+          key = key.replace("_bounds", "");
+          if (polygonClass.isTappable(key)) {
+            bounds = (LatLngBounds) entry.getValue();
+            if (bounds.contains(tapLatLng)) {
+              Polygon polygon = polygonClass.getPolygon(key);
 
-            key = key.replace("_bounds", "");
-            Polygon polygon = polygonClass.getPolygon(key);
-
-            if (this.isPolygonContains(polygon.getPoints(), point)) {
-              hitPoly = true;
-              this.onPolygonClick(polygon, point);
+              if (this.isPolygonContains(polygon.getPoints(), tapLatLng)) {
+                hitPoly = true;
+                this.onPolygonClick(polygon, tapLatLng);
+              }
             }
           }
         }
@@ -1398,9 +1436,11 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
 
       for (HashMap.Entry<String, Object> entry : circleClass.objects.entrySet()) {
         Circle circle = (Circle) entry.getValue();
-        if (this.isCircleContains(circle, point)) {
-          hitPoly = true;
-          this.onCircleClick(circle, point);
+        if (circleClass.isTappable(entry.getKey())) {
+          if (this.isCircleContains(circle, tapLatLng)) {
+            hitPoly = true;
+            this.onCircleClick(circle, tapLatLng);
+          }
         }
       }
       if (hitPoly) {
@@ -1416,10 +1456,12 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
       for (HashMap.Entry<String, Object> entry : groundOverlayClass.objects.entrySet()) {
         key = entry.getKey();
         if (key.contains("groundOverlay_")) {
-          GroundOverlay groundOverlay = (GroundOverlay) entry.getValue();
-          if (this.isGroundOverlayContains(groundOverlay, point)) {
-            hitPoly = true;
-            this.onGroundOverlayClick(groundOverlay, point);
+          if (groundOverlayClass.isTappable(key)) {
+            GroundOverlay groundOverlay = (GroundOverlay) entry.getValue();
+            if (this.isGroundOverlayContains(groundOverlay, tapLatLng)) {
+              hitPoly = true;
+              this.onGroundOverlayClick(groundOverlay, tapLatLng);
+            }
           }
         }
       }
@@ -1429,7 +1471,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
     }
 
     // Only emit click event if no overlays hit
-    this.onMapEvent("click", point);
+    this.onMapEvent("click", tapLatLng);
   }
 
   /**
@@ -1493,6 +1535,33 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
       p0 = p1;
     }
     return false;
+  }
+
+  private boolean isBoundsOverlaps(LatLngBounds baseBounds, LatLngBounds testBounds) {
+    boolean latOverlaps = false;
+    boolean lngOverlaps = false;
+
+    if (testBounds.northeast.latitude < baseBounds.northeast.latitude && testBounds.northeast.latitude > baseBounds.southwest.latitude) {
+      latOverlaps = true;
+    }
+    else if (testBounds.southwest.latitude < baseBounds.northeast.latitude && testBounds.southwest.latitude > baseBounds.southwest.latitude) {
+      latOverlaps = true;
+    }
+    else if (testBounds.southwest.latitude < baseBounds.southwest.latitude && testBounds.northeast.latitude > baseBounds.northeast.latitude) {
+      latOverlaps = true;
+    }
+
+    if (testBounds.northeast.longitude < baseBounds.northeast.longitude && testBounds.northeast.longitude > baseBounds.southwest.longitude) {
+      lngOverlaps = true;
+    }
+    else if (testBounds.southwest.longitude < baseBounds.northeast.longitude && testBounds.southwest.longitude > baseBounds.southwest.longitude) {
+      lngOverlaps = true;
+    }
+    else if (testBounds.southwest.longitude < baseBounds.southwest.longitude && testBounds.northeast.longitude > baseBounds.northeast.longitude) {
+      lngOverlaps = true;
+    }
+
+    return latOverlaps && lngOverlaps;
   }
 
   /**
@@ -2001,66 +2070,6 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
     mapDivLayoutJSON = null;
     System.gc();
     this.sendNoResult(callbackContext);
-  }
-
-  @SuppressWarnings("unused")
-  private void getOverlaysInBounds(JSONArray args, CallbackContext callbackContext) throws JSONException {
-    String key;
-
-    JSONObject boundsdata = args.getJSONObject(0);
-    JSONObject swdata = boundsdata.getJSONObject("southwest");
-    JSONObject nedata = boundsdata.getJSONObject("northeast");
-
-    LatLng sw = new LatLng(swdata.getDouble("lat"), swdata.getDouble("lng"));
-    LatLng ne = new LatLng(nedata.getDouble("lat"), nedata.getDouble("lng"));
-    LatLngBounds searchBounds = new LatLngBounds(sw, ne);
-
-    JSONObject response = new JSONObject();
-    JSONArray boundedOverlays = new JSONArray();
-
-    int numOverlaysSearched = 0;
-
-    PluginEntry polylinePlugin = this.plugins.get("Polyline");
-    if(polylinePlugin != null) {
-      PluginPolyline polylineClass = (PluginPolyline) polylinePlugin.plugin;
-
-      List<LatLng> points;
-      Polyline polyline;
-      LatLng point;
-
-      for (HashMap.Entry<String, Object> entry : polylineClass.objects.entrySet()) {
-        key = entry.getKey();
-        if (key.contains("polyline_bounds_")) {
-          key = key.replace("bounds_", "");
-          numOverlaysSearched++;
-
-          polyline = polylineClass.getPolyline(key);
-          points = polyline.getPoints();
-
-          for (int i = 0; i < points.size(); i++) {
-            point = points.get(i);
-            if (searchBounds.contains(point)) {
-              boundedOverlays.put(key);
-              break;
-            }
-          }
-        }
-      }
-    }
-
-    //PluginEntry markerPlugin = this.plugins.get("Marker");
-    //if(markerPlugin != null) {
-    //  PluginMarker pluginMarker = (PluginMarker)markerPlugin.plugin;
-    //  for (HashMap.Entry<String, Object> entry : polylineClass.objects.entrySet()) {
-    //  }
-    //}
-
-    //response.put("boundsdata", boundsdata);
-    response.put("bounded", boundedOverlays);
-    response.put("numOverlaysSearched", numOverlaysSearched);
-    response.put("sw", swdata);
-    response.put("ne", nedata);
-    callbackContext.success(response);
   }
 
   protected void sendNoResult(CallbackContext callbackContext) {

@@ -18,14 +18,14 @@ public class PluginPolygon extends MyPlugin implements MyPluginInterface  {
    * Create polygon
    * @param args
    * @param callbackContext
-   * @throws JSONException 
+   * @throws JSONException
    */
   @SuppressWarnings("unused")
   private void createPolygon(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
     final PolygonOptions polygonOptions = new PolygonOptions();
     int color;
     LatLngBounds.Builder builder = new LatLngBounds.Builder();
-    
+
     JSONObject opts = args.getJSONObject(1);
     if (opts.has("points")) {
       JSONArray points = opts.getJSONArray("points");
@@ -56,20 +56,24 @@ public class PluginPolygon extends MyPlugin implements MyPluginInterface  {
     if (opts.has("zIndex")) {
       polygonOptions.zIndex(opts.getInt("zIndex"));
     }
-    
+
     Polygon polygon = map.addPolygon(polygonOptions);
     String id = "polygon_"+ polygon.getId();
     this.objects.put(id, polygon);
-    
+
+    if (opts.has("tappable") && opts.getBoolean("tappable")) {
+      this.tappables.put(id, true);
+    }
+
     String boundsId = "polygon_bounds_" + polygon.getId();
     this.objects.put(boundsId, builder.build());
-    
+
     JSONObject result = new JSONObject();
     result.put("hashCode", polygon.hashCode());
     result.put("id", id);
     callbackContext.success(result);
   }
-  
+
 
   /**
    * set fill color
@@ -83,7 +87,7 @@ public class PluginPolygon extends MyPlugin implements MyPluginInterface  {
     int color = PluginUtil.parsePluginColor(args.getJSONArray(2));
     this.setInt("setFillColor", id, color, callbackContext);
   }
-  
+
   /**
    * set stroke color
    * @param args
@@ -96,7 +100,7 @@ public class PluginPolygon extends MyPlugin implements MyPluginInterface  {
     int color = PluginUtil.parsePluginColor(args.getJSONArray(2));
     this.setInt("setStrokeColor", id, color, callbackContext);
   }
-  
+
   /**
    * set stroke width
    * @param args
@@ -109,7 +113,7 @@ public class PluginPolygon extends MyPlugin implements MyPluginInterface  {
     float width = (float) args.getDouble(2) * this.density;
     this.setFloat("setStrokeWidth", id, width, callbackContext);
   }
-  
+
   /**
    * set z-index
    * @param args
@@ -122,7 +126,7 @@ public class PluginPolygon extends MyPlugin implements MyPluginInterface  {
     float zIndex = (float) args.getDouble(2);
     this.setFloat("setZIndex", id, zIndex, callbackContext);
   }
-  
+
   /**
    * set geodesic
    * @param args
@@ -151,7 +155,8 @@ public class PluginPolygon extends MyPlugin implements MyPluginInterface  {
       return;
     }
     this.objects.remove(id);
-    
+    this.tappables.remove(id);
+
     id = "polygon_bounds_" + polygon.getId();
     this.objects.remove(id);
     
@@ -186,7 +191,7 @@ public class PluginPolygon extends MyPlugin implements MyPluginInterface  {
    * Set visibility for the object
    * @param args
    * @param callbackContext
-   * @throws JSONException 
+   * @throws JSONException
    */
   @SuppressWarnings("unused")
   private void setVisible(JSONArray args, CallbackContext callbackContext) throws JSONException {

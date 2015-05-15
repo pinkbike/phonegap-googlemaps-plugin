@@ -451,6 +451,7 @@ public class PluginMap extends MyPlugin {
     });
 
   }
+
   @SuppressWarnings({ "unused" })
   private void fromLatLngToPoint(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
     double lat, lng;

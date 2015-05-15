@@ -956,15 +956,16 @@ App.prototype.addMarker = function(markerOptions, callback) {
 //-------------
 App.prototype.addCircle = function(circleOptions, callback) {
   var self = this;
-  circleOptions.center = circleOptions.center || {};
-  circleOptions.center.lat = circleOptions.center.lat || 0.0;
-  circleOptions.center.lng = circleOptions.center.lng || 0.0;
+  circleOptions.center      = circleOptions.center || {};
+  circleOptions.center.lat  = circleOptions.center.lat || 0.0;
+  circleOptions.center.lng  = circleOptions.center.lng || 0.0;
   circleOptions.strokeColor = HTMLColor2RGBA(circleOptions.strokeColor || "#FF0000", 0.75);
-  circleOptions.fillColor = HTMLColor2RGBA(circleOptions.fillColor || "#000000", 0.75);
+  circleOptions.fillColor   = HTMLColor2RGBA(circleOptions.fillColor || "#000000", 0.75);
   circleOptions.strokeWidth = circleOptions.strokeWidth || 10;
-  circleOptions.visible = circleOptions.visible === undefined ? true : circleOptions.visible;
-  circleOptions.zIndex = circleOptions.zIndex || 3;
-  circleOptions.radius = circleOptions.radius || 1;
+  circleOptions.visible     = circleOptions.visible === undefined ? true : circleOptions.visible;
+  circleOptions.zIndex      = circleOptions.zIndex || 3;
+  circleOptions.radius      = circleOptions.radius || 1;
+  circleOptions.tappable    = circleOptions.tappable === undefined ? true : circleOptions.tappable;
 
   cordova.exec(function(result) {
     var circle = new Circle(self, result.id, circleOptions);
@@ -989,6 +990,7 @@ App.prototype.addPolyline = function(polylineOptions, callback) {
   polylineOptions.visible     = polylineOptions.visible === undefined ? true : polylineOptions.visible;
   polylineOptions.zIndex      = polylineOptions.zIndex || 4;
   polylineOptions.geodesic    = polylineOptions.geodesic || false;
+  polylineOptions.tappable    = polylineOptions.tappable === undefined ? true : polylineOptions.tappable;
   //console.log("color = " + polylineOptions.color.join(", "));
 
   cordova.exec(function(result) {
@@ -1015,6 +1017,7 @@ App.prototype.addPolylines = function(polylineOptionsArray, callback) {
     polylineOptions.visible     = polylineOptions.visible === undefined ? true : polylineOptions.visible;
     polylineOptions.zIndex      = polylineOptions.zIndex || 4;
     polylineOptions.geodesic    = polylineOptions.geodesic || false;
+    polylineOptions.tappable    = polylineOptions.tappable === undefined ? true : polylineOptions.tappable;
   }
 
   cordova.exec(function(results) {
@@ -1073,9 +1076,10 @@ App.prototype.addPolygon = function(polygonOptions, callback) {
     polygonOptions.fillColor = HTMLColor2RGBA(polygonOptions.fillColor, 0.75);
   }
   polygonOptions.strokeWidth = polygonOptions.strokeWidth || 10;
-  polygonOptions.visible = polygonOptions.visible === undefined ? true : polygonOptions.visible;
-  polygonOptions.zIndex = polygonOptions.zIndex || 2;
-  polygonOptions.geodesic = polygonOptions.geodesic || false;
+  polygonOptions.visible     = polygonOptions.visible === undefined ? true : polygonOptions.visible;
+  polygonOptions.zIndex      = polygonOptions.zIndex || 2;
+  polygonOptions.geodesic    = polygonOptions.geodesic || false;
+  polygonOptions.tappable    = polygonOptions.tappable === undefined ? true : polygonOptions.tappable;
 
   cordova.exec(function(result) {
     var polygon = new Polygon(self, result.id, polygonOptions);
@@ -1122,11 +1126,12 @@ App.prototype.addTileOverlay = function(tilelayerOptions, callback) {
 //-------------
 App.prototype.addGroundOverlay = function(groundOverlayOptions, callback) {
   var self = this;
-  groundOverlayOptions = groundOverlayOptions || {};
-  groundOverlayOptions.url = groundOverlayOptions.url || null;
-  groundOverlayOptions.visible = groundOverlayOptions.visible === undefined ? true : groundOverlayOptions.visible;
-  groundOverlayOptions.zIndex = groundOverlayOptions.zIndex || 1;
-  groundOverlayOptions.bounds = groundOverlayOptions.bounds || [];
+  groundOverlayOptions          = groundOverlayOptions || {};
+  groundOverlayOptions.url      = groundOverlayOptions.url || null;
+  groundOverlayOptions.visible  = groundOverlayOptions.visible === undefined ? true : groundOverlayOptions.visible;
+  groundOverlayOptions.zIndex   = groundOverlayOptions.zIndex || 1;
+  groundOverlayOptions.bounds   = groundOverlayOptions.bounds || [];
+  groundOverlayOptions.tappable = groundOverlayOptions.tappable === undefined ? true : groundOverlayOptions.tappable;
 
   cordova.exec(function(result) {
     var groundOverlay = new GroundOverlay(self, result.id, groundOverlayOptions);
@@ -1537,6 +1542,8 @@ var Polyline = function(map, polylineId, polylineOptions) {
       self.set(key, polylineOptions[key]);
     }
   }
+
+  self.set('options', polylineOptions);
 };
 
 Polyline.prototype = new BaseClass();
