@@ -787,41 +787,6 @@ App.prototype.getVisibleRegion = function(callback) {
 };
 
 /**
- * Return the markups for the given bounds
- */
-App.prototype.getOverlaysInBounds = function(bounds, callback) {
-  //console.log('getOverlaysInBounds()');
-  var self = this;
-
-  if (typeof callback === "function") {
-    var arg1 = {
-      southwest: {
-        lat: bounds.southwest.lat,
-        lng: bounds.southwest.lng, 
-      },
-      northeast: {
-        lat: bounds.northeast.lat,
-        lng: bounds.northeast.lng,
-      }
-    };
-    cordova.exec(function(result) {
-      //console.log('getOverlaysInBounds callback');
-      //console.dir(result);
-
-      var markups = [];
-      for (var i = 0; i < result.bounded.length; i++) {
-        var id = result.bounded[i];
-        if (id in OVERLAYS) {
-          markups[i] = OVERLAYS[id];
-        }
-      }
-
-      callback.call(self, markups);
-    }, self.errorHandler, PLUGIN_NAME, 'getOverlaysInBounds', [arg1]);
-  }
-};
-
-/**
  * Maps an Earth coordinate to a point coordinate in the map's view.
  */
 App.prototype.fromLatLngToPoint = function(latLng, callback) {

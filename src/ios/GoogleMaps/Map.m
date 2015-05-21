@@ -30,9 +30,16 @@
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-- (void)setMyLocationEnabled:(CDVInvokedUrlCommand *)command {
+- (void)setMyLocationButtonEnabled:(CDVInvokedUrlCommand *)command {
   Boolean isEnabled = [[command.arguments objectAtIndex:1] boolValue];
   self.mapCtrl.map.settings.myLocationButton = isEnabled;
+
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)setMyLocationEnabled:(CDVInvokedUrlCommand *)command {
+  Boolean isEnabled = [[command.arguments objectAtIndex:1] boolValue];
   self.mapCtrl.map.myLocationEnabled = isEnabled;
 
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -204,8 +211,26 @@
       }
       [[UIScreen mainScreen] scale];
 
+      UIEdgeInsets padding;
+      if ([json objectForKey:@"padding"]) {
+        NSDictionary *paddingJson = [json objectForKey:@"padding"];
+        float top = [[paddingJson objectForKey:@"top"] floatValue];
+        float left = [[paddingJson objectForKey:@"left"] floatValue];
+        float right = [[paddingJson objectForKey:@"right"] floatValue];
+        float bottom = [[paddingJson objectForKey:@"bottom"] floatValue];
+
+        padding = UIEdgeInsetsMake(top, left, bottom, right);
+      }
+      else {
+        padding = UIEdgeInsetsMake(0,0,0,0);
+      }
+      padding.top    = padding.top    + 10 * scale;
+      padding.bottom = padding.bottom + 10 * scale;
+      padding.left   = padding.left   + 10 * scale;
+      padding.right  = padding.right  + 10 * scale;
+
       GMSCoordinateBounds *bounds = [[GMSCoordinateBounds alloc] initWithPath:path];
-      cameraPosition = [self.mapCtrl.map cameraForBounds:bounds insets:UIEdgeInsetsMake(10 * scale, 10* scale, 10* scale, 10* scale)];
+      cameraPosition = [self.mapCtrl.map cameraForBounds:bounds insets:padding];
     } else {
       latLng = [json objectForKey:@"target"];
       latitude = [[latLng valueForKey:@"lat"] floatValue];
@@ -379,9 +404,16 @@
       isEnabled = [[controls valueForKey:@"myLocationButton"] boolValue];
       if (isEnabled == true) {
         self.mapCtrl.map.settings.myLocationButton = YES;
-        self.mapCtrl.map.myLocationEnabled = YES;
       } else {
         self.mapCtrl.map.settings.myLocationButton = NO;
+      }
+    }
+    //myLocation
+    if ([controls valueForKey:@"myLocation"] != nil) {
+      isEnabled = [[controls valueForKey:@"myLocation"] boolValue];
+      if (isEnabled == true) {
+        self.mapCtrl.map.myLocationEnabled = YES;
+      } else {
         self.mapCtrl.map.myLocationEnabled = NO;
       }
     }
@@ -454,9 +486,16 @@
   float right = [[paddingJson objectForKey:@"right"] floatValue];
   float bottom = [[paddingJson objectForKey:@"bottom"] floatValue];
 
-  UIEdgeInsets padding = UIEdgeInsetsMake(top, left, bottom, right);
+  UIEdgeInsets newPadding = UIEdgeInsetsMake(top, left, bottom, right);
 
-  [self.mapCtrl.map setPadding:padding];
+  //UIEdgeInsets oldPadding = self.mapCtrl.map.padding;
+  //float deltaX = ((newPadding.right - newPadding.left)/2 - (oldPadding.right-oldPadding.left)/2);
+  //float deltaY = ((newPadding.top - newPadding.bottom)/2 - (oldPadding.top-oldPadding.bottom)/2);
+
+  //GMSCameraUpdate *updatedCamera = [GMSCameraUpdate scrollByX:deltaX Y:deltaY];
+
+  //[self.mapCtrl.map moveCamera:updatedCamera];
+  [self.mapCtrl.map setPadding:newPadding];
 }
 
 - (void)getFocusedBuilding:(CDVInvokedUrlCommand*)command {

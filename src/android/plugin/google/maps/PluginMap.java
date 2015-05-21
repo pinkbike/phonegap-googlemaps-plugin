@@ -50,7 +50,9 @@ public class PluginMap extends MyPlugin {
       }
       if (controls.has("myLocationButton")) {
         settings.setMyLocationButtonEnabled(controls.getBoolean("myLocationButton"));
-        map.setMyLocationEnabled(controls.getBoolean("myLocationButton"));
+      }
+      if (controls.has("myLocation")) {
+        map.setMyLocationEnabled(controls.getBoolean("myLocation"));
       }
     }
 
@@ -294,11 +296,24 @@ public class PluginMap extends MyPlugin {
    * @throws JSONException
    */
   @SuppressWarnings("unused")
+  private void setMyLocationButtonEnabled(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+    Boolean isEnabled = false;
+    isEnabled = args.getBoolean(1);
+    map.getUiSettings().setMyLocationButtonEnabled(isEnabled);
+    this.sendNoResult(callbackContext);
+  }
+
+  /**
+   * Enable MyLocation feature if set true
+   * @param args
+   * @param callbackContext
+   * @throws JSONException
+   */
+  @SuppressWarnings("unused")
   private void setMyLocationEnabled(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
     Boolean isEnabled = false;
     isEnabled = args.getBoolean(1);
-    map.setMyLocationEnabled(isEnabled);
-    map.getUiSettings().setMyLocationButtonEnabled(isEnabled);
+    map.setMyLocationEnabled(true);
     this.sendNoResult(callbackContext);
   }
 
