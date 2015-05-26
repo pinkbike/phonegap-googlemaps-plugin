@@ -56,8 +56,15 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     int color;
     LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
+    String encodedPath;
     if (opts.has("encodedPath")) {
-      List<LatLng> path = decodePoly(opts.getString("encodedPath"));
+      encodedPath = opts.getString("encodedPath");
+    }
+    else {
+      encodedPath = "";
+    }
+    if (encodedPath.length() > 0) {
+      List<LatLng> path = decodePoly(encodedPath);
       int i = 0;
       for (i = 0; i < path.size(); i++) {
         polylineOptions.add(path.get(i));

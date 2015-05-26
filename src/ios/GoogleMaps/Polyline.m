@@ -20,7 +20,7 @@
   GMSMutablePath *path;
 
   NSString *encodedPath = [json objectForKey:@"encodedPath"];
-  if (encodedPath) {
+  if ([encodedPath length] > 0) {
     path = [GMSMutablePath pathFromEncodedPath:encodedPath];
   }
   else {
@@ -62,6 +62,7 @@
 
   NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
   [result setObject:id forKey:@"id"];
+
   [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)polyline.hash] forKey:@"hashCode"];
 
   return result;

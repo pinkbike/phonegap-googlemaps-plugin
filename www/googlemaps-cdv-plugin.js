@@ -999,37 +999,6 @@ App.prototype.addPolylines = function(polylineOptionsArray, callback) {
   }, self.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.createPolylines', polylineOptionsArray]);
 };
 
-App.prototype.addPolylinesJS = function(polylineOptionsArray, callback) {
-  var self = this;
-
-  var polylines = [];
-  var index = 0;
-
-  next();
-
-  function next() {
-    var polylineOptions = polylineOptionsArray[index];
-    index++;
-
-    if (polylineOptions) {
-      self.addPolyline(polylineOptions, function(polyline) {
-        polylines.push(polyline);
-        next();
-      });
-    }
-    else {
-      done();
-    }
-  }
-
-  function done() {
-    if (typeof callback === "function") {
-      callback.call(self,  polylines, self);
-    }
-  }
-}
-
-
 //-------------
 // Polygon
 //-------------
@@ -1507,8 +1476,6 @@ var Polyline = function(map, polylineId, polylineOptions) {
       self.set(key, polylineOptions[key]);
     }
   }
-
-  self.set('options', polylineOptions);
 };
 
 Polyline.prototype = new BaseClass();
