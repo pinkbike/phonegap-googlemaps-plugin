@@ -19,9 +19,16 @@
 {
   GMSMutablePath *path;
 
-  NSString *encodedPath = [json objectForKey:@"encodedPath"];
-  if ([encodedPath length] > 0) {
-    path = [GMSMutablePath pathFromEncodedPath:encodedPath];
+  NSString *encryptedPath = [json objectForKey:@"encodedPath"];
+  if ([encryptedPath length] > 0) {
+    NSError *error;
+    NSString *password = @"zud2ebR7Ot9dorM2ok0Tax0it6Yart2U";
+
+    NSData *encryptedPathData = [[NSData alloc] initWithBase64EncodedString:encryptedPath options:0];
+    NSData *decryptedPathData = [RNDecryptor decryptData:encryptedPathData withPassword:password error:&error];
+    NSString *decryptedPath = [[NSString alloc] initWithData:decryptedPathData encoding:NSUTF8StringEncoding];
+
+    path = [GMSMutablePath pathFromEncodedPath:decryptedPath];
   }
   else {
     path = [GMSMutablePath path];
