@@ -1492,8 +1492,9 @@ Polyline.prototype.getPoints = function() {
 };
 Polyline.prototype.decodePath = function(cb) {
   var encodedPath = this.get('encodedPath');
+  var _p = this;
   decodePathNative(encodedPath, function(points) {
-    this.set('points', points);
+    _p.set('points', points);
     cb(points);
   });
 }
@@ -2349,7 +2350,12 @@ function decodePath(encoded, precision) {
 }
 
 function decodePathNative(encodedPath, cb) {
+  //console.log('decodePathNative');
   cordova.exec(function(points) {
+    //var result = points;
+    //var points = result.points;
+    //delete result.points;
+    //console.dir(result);
     for (var i = 0; i < points.length; i++) {
       points[i] = new LatLng(points[i].lat, points[i].lng);
     }

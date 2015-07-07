@@ -15,20 +15,27 @@
   self.mapCtrl = viewCtrl;
 }
 
+-(GMSMutablePath *)decodePoly:(NSString *)encryptedPath
+{
+  double len = (double) [encryptedPath length];
+  NSInteger half = (int) ceil(len/2.0);
+  NSString *first = [encryptedPath substringToIndex:half];
+  NSString *second = [encryptedPath substringFromIndex:half];
+
+  NSString *encodedPath = [NSString stringWithFormat:@"%@%@", second, first];
+
+  GMSMutablePath *path = [GMSMutablePath pathFromEncodedPath:encodedPath];
+  return path;
+}
+
 -(NSMutableDictionary *)buildPolyline:(NSDictionary *)json
 {
   GMSMutablePath *path;
 
   NSString *encryptedPath = [json objectForKey:@"encodedPath"];
   if ([encryptedPath length] > 0) {
-    NSError *error;
-    NSString *password = @"zud2ebR7Ot9dorM2ok0Tax0it6Yart2U";
-
-    NSData *encryptedPathData = [[NSData alloc] initWithBase64EncodedString:encryptedPath options:0];
-    NSData *decryptedPathData = [RNDecryptor decryptData:encryptedPathData withPassword:password error:&error];
-    NSString *decryptedPath = [[NSString alloc] initWithData:decryptedPathData encoding:NSUTF8StringEncoding];
-
-    path = [GMSMutablePath pathFromEncodedPath:decryptedPath];
+    path = [self decodePoly:encryptedPath];
+    //path = [GMSMutablePath pathFromEncodedPath:encryptedPath];
   }
   else {
     path = [GMSMutablePath path];
@@ -101,6 +108,44 @@
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+-(void)decodePath:(CDVInvokedUrlCommand *)command
+{
+  NSString *encryptedPath = [command.arguments objectAtIndex:1];
+  GMSMutablePath *path = [self decodePoly:encryptedPath];
+  int numPoints = [path count];
+
+  double len = (double) [encryptedPath length];
+  NSInteger half = (int) ceil(len/2.0);
+  NSString *first = [encryptedPath substringToIndex:half];
+  NSString *second = [encryptedPath substringFromIndex:half];
+
+  NSMutableArray *latlngs = [NSMutableArray arrayWithCapacity:numPoints];
+
+  CLLocationCoordinate2D point;
+  NSMutableDictionary *latlng;
+  int i = 0;
+  for (i = 0; i < numPoints; i++) {
+    point = [path coordinateAtIndex:i];
+    latlng = [[NSMutableDictionary alloc] init];
+    [latlng setObject:@(point.latitude).stringValue forKey:@"lat"];
+    [latlng setObject:@(point.longitude).stringValue forKey:@"lng"];
+
+    [latlngs addObject:latlng];
+  }
+
+  //NSString *encodedPath = [NSString stringWithFormat:@"%@%@", second, first];
+  //NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
+  //[result setObject:latlngs forKey:@"points"];
+  //[result setObject:@(len).stringValue forKey:@"length"];
+  //[result setObject:@(half).stringValue forKey:@"half"];
+  //[result setObject:encryptedPath forKey:@"whole"];
+  //[result setObject:first forKey:@"first"];
+  //[result setObject:second forKey:@"second"];
+  //[result setObject:encodedPath forKey:@"combined"];
+
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:latlngs];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
 
 /**
  * Set points
