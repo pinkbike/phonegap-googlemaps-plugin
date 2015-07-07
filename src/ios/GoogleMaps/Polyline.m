@@ -114,11 +114,6 @@
   GMSMutablePath *path = [self decodePoly:encryptedPath];
   int numPoints = [path count];
 
-  double len = (double) [encryptedPath length];
-  NSInteger half = (int) ceil(len/2.0);
-  NSString *first = [encryptedPath substringToIndex:half];
-  NSString *second = [encryptedPath substringFromIndex:half];
-
   NSMutableArray *latlngs = [NSMutableArray arrayWithCapacity:numPoints];
 
   CLLocationCoordinate2D point;
@@ -133,6 +128,10 @@
     [latlngs addObject:latlng];
   }
 
+  //double len = (double) [encryptedPath length];
+  //NSInteger half = (int) ceil(len/2.0);
+  //NSString *first = [encryptedPath substringToIndex:half];
+  //NSString *second = [encryptedPath substringFromIndex:half];
   //NSString *encodedPath = [NSString stringWithFormat:@"%@%@", second, first];
   //NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
   //[result setObject:latlngs forKey:@"points"];
