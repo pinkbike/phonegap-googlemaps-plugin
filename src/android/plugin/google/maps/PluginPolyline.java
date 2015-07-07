@@ -17,15 +17,18 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
 
-  private static List<LatLng> decodePoly(String encoded) {
+  private static List<LatLng> decodePoly(String encryptedPath) {
+    int half = (int)Math.ceil(encryptedPath.length()/2.0);
+    String encodedPath = encryptedPath.substring(half)+encryptedPath.substring(0,half);
+
     List<LatLng> poly = new ArrayList<LatLng>();
-    int index = 0, len = encoded.length();
+    int index = 0, len = encodedPath.length();
     int lat = 0, lng = 0;
 
     while (index < len) {
       int b, shift = 0, result = 0;
       do {
-        b = encoded.charAt(index++) - 63;
+        b = encodedPath.charAt(index++) - 63;
         result |= (b & 0x1f) << shift;
         shift += 5;
       } while (b >= 0x20);
@@ -35,7 +38,7 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
       shift = 0;
       result = 0;
       do {
-        b = encoded.charAt(index++) - 63;
+        b = encodedPath.charAt(index++) - 63;
         result |= (b & 0x1f) << shift;
         shift += 5;
       } while (b >= 0x20);
@@ -56,20 +59,21 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     int color;
     LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-    String encodedPath;
+    String encryptedPath;
     if (opts.has("encodedPath")) {
-      encodedPath = opts.getString("encodedPath");
+      encryptedPath = opts.getString("encodedPath");
     }
     else {
-      encodedPath = "";
+      encryptedPath = "";
     }
-    if (encodedPath.length() > 0) {
-      List<LatLng> path = decodePoly(encodedPath);
-      int i = 0;
-      for (i = 0; i < path.size(); i++) {
-        polylineOptions.add(path.get(i));
-        builder.include(path.get(i));
-      }
+
+    if (encryptedPath.length() > 0) {
+        List<LatLng> path = decodePoly(encryptedPath);
+        int i = 0;
+        for (i = 0; i < path.size(); i++) {
+          polylineOptions.add(path.get(i));
+          builder.include(path.get(i));
+        }
     }
     else if (opts.has("points")) {
       JSONArray points = opts.getJSONArray("points");
@@ -123,10 +127,6 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
    */
   @SuppressWarnings("unused")
   private void createPolyline(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-    final PolylineOptions polylineOptions = new PolylineOptions();
-    int color;
-    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
     JSONObject opts = args.getJSONObject(1);
     JSONObject result = this.buildPolyline(opts);
     callbackContext.success(result);
@@ -140,10 +140,6 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
    */
   @SuppressWarnings("unused")
   private void createPolylines(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-    final PolylineOptions polylineOptions = new PolylineOptions();
-    int color;
-    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
     JSONArray polylinesOptionsArray = args.getJSONArray(1);
 
     JSONArray polylines = new JSONArray();
@@ -158,6 +154,31 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     callbackContext.success(polylines);
     //callbackContext.success(polylinesOptionsArray);
 
+  }
+
+  /**
+   * Decode encoded paths
+   * @param args
+   * @param callbackContext
+   * @throws JSONException
+   */
+  @SuppressWarnings("unused")
+  private void decodePath(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+    String encryptedPath = args.getString(1);
+
+    JSONArray points = new JSONArray();
+    JSONObject point;
+    LatLng latlng;
+    List<LatLng> path = decodePoly(encryptedPath);
+    int i = 0;
+    for (i = 0; i < path.size(); i++) {
+      point = new JSONObject();
+      latlng = path.get(i);
+      point.put("lat", Double.valueOf(latlng.latitude));
+      point.put("lng", Double.valueOf(latlng.longitude));
+      points.put(point);
+    }
+    callbackContext.success(points);
   }
 
   /**

@@ -367,11 +367,6 @@ App.prototype.setWatchDogTimer = function(time) {
   var self = this;
   time = time || 100;
   self.set('watchDogTimer', time);
-
-  if(time < 50) {
-    //console.log('Warning: watchdog values under 50ms will drain battery a lot. Just use for short operation times.');
-  }
-
 };
 
 /**
@@ -956,14 +951,10 @@ App.prototype.addPolyline = function(polylineOptions, callback) {
   polylineOptions.zIndex      = polylineOptions.zIndex || 4;
   polylineOptions.geodesic    = polylineOptions.geodesic || false;
   polylineOptions.tappable    = polylineOptions.tappable === undefined ? true : polylineOptions.tappable;
-  //console.log("color = " + polylineOptions.color.join(", "));
 
   cordova.exec(function(result) {
     var polyline = new Polyline(self, result.id, polylineOptions);
     OVERLAYS[result.id] = polyline;
-    /*if (typeof polylineOptions.onClick === "function") {
-      polyline.on(plugin.google.maps.event.OVERLAY_CLICK, polylineOptions.onClick);
-    }*/
     if (typeof callback === "function") {
       callback.call(self,  polyline, self);
     }
@@ -1497,8 +1488,15 @@ Polyline.prototype.setPoints = function(points) {
   cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.setPoints', this.getId(), path]);
 };
 Polyline.prototype.getPoints = function() {
-  return this.get("points");
+  return this.get('points');
 };
+Polyline.prototype.decodePath = function(cb) {
+  var encodedPath = this.get('encodedPath');
+  decodePathNative(encodedPath, function(points) {
+    this.set('points', points);
+    cb(points);
+  });
+}
 Polyline.prototype.setColor = function(color) {
   this.set('color', color);
   cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.setColor', this.getId(), HTMLColor2RGBA(color, 0.75)]);
@@ -1592,7 +1590,7 @@ Polygon.prototype.setPoints = function(points) {
   cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'exec', ['Polygon.setPoints', this.getId(), path]);
 };
 Polygon.prototype.getPoints = function() {
-  return this.get("points");
+  return this.get('points');
 };
 Polygon.prototype.setFillColor = function(color) {
   this.set('fillColor', color);
@@ -2350,6 +2348,15 @@ function decodePath(encoded, precision) {
   return array;
 }
 
+function decodePathNative(encodedPath, cb) {
+  cordova.exec(function(points) {
+    for (var i = 0; i < points.length; i++) {
+      points[i] = new LatLng(points[i].lat, points[i].lng);
+    }
+    cb(points);
+  }, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.decodePath', encodedPath]);
+}
+
 //encode functions
 function encodePath(points) {
   var plat = 0;
@@ -2447,9 +2454,10 @@ module.exports = {
   geometry: {
     encoding: {
       decodePath: decodePath,
-      encodePath: encodePath
+      encodePath: encodePath,
+      decodePathNative: decodePathNative,
     }
-  }
+  },
 };
 
 cordova.addConstructor(function() {

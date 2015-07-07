@@ -69,6 +69,23 @@
         <source-file src="src/android/plugin/google/maps/PluginUtil.java" target-dir="src/plugin/google/maps" />
         <source-file src="src/android/plugin/google/maps/PluginAsyncInterface.java" target-dir="src/plugin/google/maps" />
 
+        <source-file src="src/android/plugin/google/maps/jncryptor/AES256Ciphertext.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/AES256JNCryptor.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/AES256JNCryptorInputStream.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/AES256JNCryptorOutputStream.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/AES256v2Ciphertext.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/AES256v2HeaderData.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/AES256v3Ciphertext.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/CryptorException.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/InvalidDataException.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/InvalidHMACException.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/JNCryptor.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/PasswordKey.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/StreamIntegrityException.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/StreamUtils.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/TrailerInputStream.java" target-dir="src/plugin/google/maps/jncryptor" />
+        <source-file src="src/android/plugin/google/maps/jncryptor/Validate.java" target-dir="src/plugin/google/maps/jncryptor" />
+
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data
               android:name="com.google.android.maps.v2.API_KEY"
