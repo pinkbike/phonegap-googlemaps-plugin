@@ -962,6 +962,7 @@ App.prototype.addPolyline = function(polylineOptions, callback) {
 };
 
 App.prototype.addPolylines = function(polylineOptionsArray, callback) {
+  //console.log('plugin addPolylines');
   var self = this;
 
   for (var i = 0; i < polylineOptionsArray.length; i++) {
@@ -977,6 +978,8 @@ App.prototype.addPolylines = function(polylineOptionsArray, callback) {
   }
 
   cordova.exec(function(results) {
+    //console.log('addPolylines callback');
+    //console.dir(results);
     var polylines = [];
     for (var i = 0; i < results.length; i++) {
       var polyline = new Polyline(self, results[i].id, polylineOptionsArray[i]);

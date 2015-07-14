@@ -18,11 +18,29 @@
 -(GMSMutablePath *)decodePoly:(NSString *)encryptedPath
 {
   double len = (double) [encryptedPath length];
-  NSInteger half = (int) ceil(len/2.0);
-  NSString *first = [encryptedPath substringToIndex:half];
-  NSString *second = [encryptedPath substringFromIndex:half];
 
-  NSString *encodedPath = [NSString stringWithFormat:@"%@%@", second, first];
+  //NSInteger half = (int) ceil(len/2.0);
+  //NSString *first = [encryptedPath substringToIndex:half];
+  //NSString *second = [encryptedPath substringFromIndex:half];
+  //NSString *encodedPath = [NSString stringWithFormat:@"%@%@", second, first];
+
+  int chunkSize = 5;
+  int numChunks = (int) ceil(len/chunkSize);
+  int pos = len;
+  int start;
+  NSRange range;
+  NSString *chunk;
+  NSMutableArray *chunks = [NSMutableArray arrayWithCapacity:numChunks];
+  while (pos >= 0) {
+    start = MAX(pos-chunkSize, 0);
+    range = NSMakeRange(start, pos - start);
+    chunk = [encryptedPath substringWithRange:range];
+    [chunks addObject:chunk];
+    pos -= chunkSize;
+  }
+  NSString *encodedPath = [chunks componentsJoinedByString:@""];
+
+  //NSString *encodedPath = encryptedPath;
 
   GMSMutablePath *path = [GMSMutablePath pathFromEncodedPath:encodedPath];
   return path;
@@ -30,8 +48,9 @@
 
 -(NSMutableDictionary *)buildPolyline:(NSDictionary *)json
 {
-  GMSMutablePath *path;
+  NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
 
+  GMSMutablePath *path;
   NSString *encryptedPath = [json objectForKey:@"encodedPath"];
   if ([encryptedPath length] > 0) {
     path = [self decodePoly:encryptedPath];
@@ -74,7 +93,6 @@
   [self.mapCtrl.overlayManager setObject:polyline forKey: id];
   polyline.title = id;
 
-  NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
   [result setObject:id forKey:@"id"];
 
   [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)polyline.hash] forKey:@"hashCode"];

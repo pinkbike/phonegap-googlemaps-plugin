@@ -1,5 +1,7 @@
 package plugin.google.maps;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.graphics.Color;
+import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -18,8 +21,22 @@ import com.google.android.gms.maps.model.PolylineOptions;
 public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
 
   private static List<LatLng> decodePoly(String encryptedPath) {
-    int half = (int)Math.ceil(encryptedPath.length()/2.0);
-    String encodedPath = encryptedPath.substring(half)+encryptedPath.substring(0,half);
+    int encryptedPathLength = encryptedPath.length();
+    int chunkSize = 5;
+    int numChunks = (int) Math.ceil(encryptedPathLength/chunkSize) + 1;
+    int curChunk = 0;
+    int pos = encryptedPathLength;
+    int start;
+    String chunk;
+    String[] chunks = new String[numChunks];
+    while (pos >= 0) {
+      start = Math.max(pos-chunkSize, 0);
+      chunk = encryptedPath.substring(start, pos);
+      chunks[curChunk] = chunk;
+      pos -= chunkSize;
+      curChunk += 1;
+    }
+    String encodedPath = TextUtils.join("", chunks);
 
     List<LatLng> poly = new ArrayList<LatLng>();
     int index = 0, len = encodedPath.length();
@@ -55,6 +72,8 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
   }
 
   private JSONObject buildPolyline(final JSONObject opts) throws JSONException {
+    JSONObject result = new JSONObject();
+
     final PolylineOptions polylineOptions = new PolylineOptions();
     int color;
     LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -67,6 +86,7 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
       encryptedPath = "";
     }
 
+    //result.put("encryptedPath", encryptedPath);
     if (encryptedPath.length() > 0) {
         List<LatLng> path = decodePoly(encryptedPath);
         int i = 0;
@@ -84,6 +104,7 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
         builder.include(path.get(i));
       }
     }
+
     if (opts.has("color")) {
       color = PluginUtil.parsePluginColor(opts.getJSONArray("color"));
       polylineOptions.color(color);
@@ -108,7 +129,6 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     String boundsId = "polyline_bounds_" + polyline.getId();
     this.objects.put(boundsId, builder.build());
 
-    JSONObject result = new JSONObject();
     result.put("hashCode", polyline.hashCode());
     result.put("id", id);
 
@@ -140,6 +160,8 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
    */
   @SuppressWarnings("unused")
   private void createPolylines(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+    //Log.w("GoogleMaps", "createPolylines");
+
     JSONArray polylinesOptionsArray = args.getJSONArray(1);
 
     JSONArray polylines = new JSONArray();
@@ -152,8 +174,6 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
       polylines.put(result);
     }
     callbackContext.success(polylines);
-    //callbackContext.success(polylinesOptionsArray);
-
   }
 
   /**
