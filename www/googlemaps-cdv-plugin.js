@@ -251,12 +251,12 @@ App.prototype._onCameraEvent = function(eventName, params) {
 };
 
 App.prototype.getAPISecret = function(callback) {
-    console.log('getAPISecret');
+  //console.log('getAPISecret');
   var self = this;
 
   cordova.exec(function(response) {
-    console.log('response');
-    console.dir(response);
+    //console.log('response');
+    //console.dir(response);
     callback(response.secret);
   }, self.errorHandler, PLUGIN_NAME, 'getAPISecret', []);
 
