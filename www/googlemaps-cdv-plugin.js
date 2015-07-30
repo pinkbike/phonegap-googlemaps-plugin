@@ -250,6 +250,18 @@ App.prototype._onCameraEvent = function(eventName, params) {
   this.trigger(eventName, cameraPosition, this);
 };
 
+App.prototype.getAPISecret = function(callback) {
+    console.log('getAPISecret');
+  var self = this;
+
+  cordova.exec(function(response) {
+    console.log('response');
+    console.dir(response);
+    callback(response.secret);
+  }, self.errorHandler, PLUGIN_NAME, 'getAPISecret', []);
+
+  return self;
+};
 
 App.prototype.getMap = function(div, params) {
   var self = this,

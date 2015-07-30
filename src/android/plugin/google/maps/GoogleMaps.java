@@ -322,6 +322,14 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
   }
 
   @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+  private void getAPISecret(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+    String secret = "54cb8aa62942b8f3";
+    JSONObject result = new JSONObject();
+    result.put("secret", secret);
+    callbackContext.success(result);
+  }
+
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
   private void getMap(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
     if (map != null) {
       callbackContext.success();
