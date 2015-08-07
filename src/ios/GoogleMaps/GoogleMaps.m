@@ -134,6 +134,17 @@
   [self.pluginScrollView.debugView setNeedsDisplay];
 }
 
+- (void)getAPISecret:(CDVInvokedUrlCommand *)command {
+  NSString *secret = @"54cb8aa62942b8f3";
+
+  NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
+  [result setObject:secret forKey:@"secret"];
+
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+
 /**
  * Intialize the map
  */
