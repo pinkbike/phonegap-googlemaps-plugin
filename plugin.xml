@@ -45,6 +45,7 @@
         </config-file>
 
         <dependency id="com.google.playservices" url="https://github.com/wf9a5m75/google-play-services#v23" />
+        <!--<dependency id="com.google.playservices" url="https://github.com/lakano/google-play-services.git" /> v25 -->
 
         <!-- plugin src files -->
         <source-file src="src/android/plugin/google/maps/AsyncLicenseInfo.java" target-dir="src/plugin/google/maps" />
