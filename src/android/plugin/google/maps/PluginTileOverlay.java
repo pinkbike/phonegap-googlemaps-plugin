@@ -29,7 +29,7 @@ public class PluginTileOverlay extends MyPlugin implements MyPluginInterface {
     if (opts.has("opacity")) {
       opacity = opts.getDouble("opacity");
     }
-    PluginTileProvider tileProvider = new PluginTileProvider(tileUrlFormat, opacity, tileSize);
+    PluginTileProvider tileProvider = new PluginTileProvider(tileSize, tileSize, tileUrlFormat);
 
     TileOverlayOptions options = new TileOverlayOptions();
     options.tileProvider(tileProvider);
@@ -119,19 +119,5 @@ public class PluginTileOverlay extends MyPlugin implements MyPluginInterface {
     boolean visible = args.getBoolean(2);
     String id = args.getString(1);
     this.setBoolean("setFadeIn", id, visible, callbackContext);
-  }
-  /**
-   * Set opacity for the tile layer
-   * @param args
-   * @param callbackContext
-   * @throws JSONException 
-   */
-  protected void setOpacity(JSONArray args, CallbackContext callbackContext) throws JSONException {
-    double opacity = args.getDouble(2);
-    String id = args.getString(1);
-    id = id.replace("tile_", "tileProvider_");
-    
-    PluginTileProvider tileProvider = (PluginTileProvider)this.objects.get(id);
-    tileProvider.setOpacity(opacity);
   }
 }

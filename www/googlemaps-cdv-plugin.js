@@ -1721,10 +1721,6 @@ TileOverlay.prototype.setVisible = function(visible) {
 TileOverlay.prototype.getOpacity = function() {
   return this.get('opacity');
 };
-TileOverlay.prototype.setOpacity = function(opacity) {
-  this.set('opacity', opacity);
-  cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'exec', ['TileOverlay.setOpacity', this.getId(), opacity]);
-};
 TileOverlay.prototype.getVisible = function() {
   return this.get('visible');
 };
