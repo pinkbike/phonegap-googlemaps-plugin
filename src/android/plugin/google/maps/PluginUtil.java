@@ -157,6 +157,9 @@ public class PluginUtil {
     if (bitmap == null) {
       return null;
     }
+    if (newWidth < 1 || newHeight < 1) {
+      return null;
+    }
     /**
      * http://stackoverflow.com/questions/4821488/bad-image-quality-after-resizing-scaling-bitmap#7468636
      */

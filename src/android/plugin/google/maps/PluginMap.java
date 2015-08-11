@@ -455,13 +455,18 @@ public class PluginMap extends MyPlugin {
                                         (int)(image.getWidth() / density),
                                         (int)(image.getHeight() / density));
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-        byte[] byteArray = outputStream.toByteArray();
-        String imageEncoded = "data:image/png;base64," +
-                Base64.encodeToString(byteArray, Base64.NO_WRAP);
+        if (image != null) {
+          ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+          image.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+          byte[] byteArray = outputStream.toByteArray();
+          String imageEncoded = "data:image/png;base64," +
+                  Base64.encodeToString(byteArray, Base64.NO_WRAP);
 
-        callbackContext.success(imageEncoded);
+          callbackContext.success(imageEncoded);
+        }
+        else {
+          callbackContext.error("Cannot convert to data url");
+        }
       }
     });
 
