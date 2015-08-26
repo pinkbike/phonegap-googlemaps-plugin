@@ -24,25 +24,43 @@
   //NSString *second = [encryptedPath substringFromIndex:half];
   //NSString *encodedPath = [NSString stringWithFormat:@"%@%@", second, first];
 
-  int chunkSize = 5;
-  int numChunks = (int) ceil(len/chunkSize);
-  int pos = len;
-  int start;
-  NSRange range;
-  NSString *chunk;
-  NSMutableArray *chunks = [NSMutableArray arrayWithCapacity:numChunks];
-  while (pos >= 0) {
-    start = MAX(pos-chunkSize, 0);
-    range = NSMakeRange(start, pos - start);
-    chunk = [encryptedPath substringWithRange:range];
-    [chunks addObject:chunk];
-    pos -= chunkSize;
+  NSString *encodedPath;
+
+  @try {
+    int chunkSize = 5;
+    int numChunks = (int) ceil(len/chunkSize);
+    int pos = len;
+    int start;
+    NSRange range;
+    NSString *chunk;
+    NSMutableArray *chunks = [NSMutableArray arrayWithCapacity:numChunks];
+    while (pos >= 0) {
+      start = MAX(pos-chunkSize, 0);
+      range = NSMakeRange(start, pos - start);
+      chunk = [encryptedPath substringWithRange:range];
+      [chunks addObject:chunk];
+      pos -= chunkSize;
+    }
+    encodedPath = [chunks componentsJoinedByString:@""];
   }
-  NSString *encodedPath = [chunks componentsJoinedByString:@""];
+  @catch (NSException *exception) {
+    NSLog(@"Error parsing encrypted path");
+    NSLog(@"%@", exception.reason);
+    encodedPath = @"";
+  }
 
   //NSString *encodedPath = encryptedPath;
 
-  GMSMutablePath *path = [GMSMutablePath pathFromEncodedPath:encodedPath];
+  GMSMutablePath *path;
+  @try {
+    path = [GMSMutablePath pathFromEncodedPath:encodedPath];
+  }
+  @catch (NSException *exception) {
+    NSLog(@"Error creating path from encodedPath");
+    NSLog(@"%@", exception.reason);
+    path = [GMSMutablePath path];
+  }
+
   return path;
 }
 
