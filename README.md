@@ -22,6 +22,62 @@ New versions will be announced through the official community. Stay tuned!
 
 ###What's up?
 
+v.1.3.0
+
+- Updated Google Maps iOS SDK to 1.10.2
+
+**INFORMATION**
+
+In order to install the new version, you have to:
+
+1) Delete plugin 
+> cordova plugin rm plugin.google.maps
+
+2) Delete Google Maps iOS SDK 
+> cordova plugin rm com.googlemaps.ios
+
+3) Re-Install plugin from master (follow wiki for Mac/Linux/Windows)
+> cordova plugin add https://github.com/wf9a5m75/phonegap-googlemaps-plugin --variable API_KEY_FOR_ANDROID="YOUR_KEY" --variable API_KEY_FOR_IOS="YOUR_KEY"
+
+If you have some weird compiling errors, you're probably missing some linked frameworks. Set the Target Membership
+https://www.youtube.com/watch?v=gr0QrEShPbQ
+or just delete your iOS platform and re-install.
+
+Required XCode Version is 6.3+ (due to ABI changes)
+The minimum target iOS version for Google Maps SDK for iOS is now 7.0. Version 6.0 is no longer supported.
+This release requires the following additional dependencies in your project: Accelerate.framework, CoreBluetooth.framework, CoreGraphics.framework, Security.framework
+
+This will be set automatically when you install with CLI.
+
+BITCODE isn't supported currently. Google Maps hasn't update now. Just disable Bitcode in XCode 7 when you get compile errors.
+
+v.1.2.9
+
+**Add:**
+
+- Implement maxWidth for Marker InfoWindow https://github.com/wf9a5m75/phonegap-googlemaps-plugin/pull/503
+
+v.1.2.8
+
+**Fixes**
+
+- Support for cordova-android 4.x (Cordova 5.x) -> many thanks to @wolf-s
+- Fixed bug with base64 icons, icons from file
+- Fixed https://github.com/wf9a5m75/phonegap-googlemaps-plugin/issues/591
+- Fixed play-service dependency https://github.com/wf9a5m75/phonegap-googlemaps-plugin/pull/567
+- Fixed plugin init on new cordova-android version
+- Compatibility with https://github.com/crosswalk-project/cordova-plugin-crosswalk-webview (have a look at the wiki and the issues)
+- Fixed https://github.com/wf9a5m75/phonegap-googlemaps-plugin/pull/551
+- Fixed crash on android when marker is not available https://github.com/wf9a5m75/phonegap-googlemaps-plugin/pull/529
+- Fixed .off() listener bug https://github.com/wf9a5m75/phonegap-googlemaps-plugin/pull/517
+
+**Added**
+
+- pass "params" to marker and retrieve with marker.getParams() https://github.com/wf9a5m75/phonegap-googlemaps-plugin/issues/54
+
+v.1.2.7
+- Support for cordova-android 4.x (Cordova 5.x) -> many thanks to @wolf-s
+
 v1.2.5
 - Add : The `opacity` and `tileSize` properties has been added to `map.addTileOverlay()`
 - Add : Add marker animations: `DROP` and `BOUNCE`
@@ -135,10 +191,6 @@ Check out the [release notes](https://github.com/wf9a5m75/phonegap-googlemaps-pl
 
 -----
 
-##Do you want to use marker cluster?
-
-Marker clustering is the technique for grouping some markers based on bounds. This reduces the marker on the map, and reduce the memory usage.
-
-<img src="https://googledrive.com/host/0B1ECfqTCcLE8SHVUX25xcmNIUTQ/marker_cluster.png" width="250">
-
-[![Bountysource](https://www.bountysource.com/badge/team?team_id=942&style=raised)](https://www.bountysource.com/teams/phonegap-googlemaps-plugin?utm_source=PhoneGap%20GoogleMaps%20Plugin&utm_medium=shield&utm_campaign=raised) / $500
+##Crosswalk
+If you want to use crosswalk, just follow this easy documentation. 
+[Install Plugin with Crosswalk](https://github.com/wf9a5m75/phonegap-googlemaps-plugin/wiki/Tutorial-for-CrossWalk-Webview-Plugin-%28Android%29)
