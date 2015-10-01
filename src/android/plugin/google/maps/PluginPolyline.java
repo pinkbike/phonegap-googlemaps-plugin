@@ -39,33 +39,39 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     String encodedPath = TextUtils.join("", chunks);
 
     List<LatLng> poly = new ArrayList<LatLng>();
-    int index = 0, len = encodedPath.length();
-    int lat = 0, lng = 0;
 
-    while (index < len) {
-      int b, shift = 0, result = 0;
-      do {
-        b = encodedPath.charAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lat += dlat;
+    try {
+      int index = 0, len = encodedPath.length();
+      int lat = 0, lng = 0;
 
-      shift = 0;
-      result = 0;
-      do {
-        b = encodedPath.charAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lng += dlng;
+      while (index < len) {
+        int b, shift = 0, result = 0;
+        do {
+          b = encodedPath.charAt(index++) - 63;
+          result |= (b & 0x1f) << shift;
+          shift += 5;
+        } while (b >= 0x20);
+        int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+        lat += dlat;
 
-      LatLng p = new LatLng(((double) lat / (double) 1E5), ((double) lng / (double) 1E5));
-      poly.add(p);
-      //poly.add(((double) lat / (double) 1E5));
-      //poly.add(((double) lng / (double) 1E5));
+        shift = 0;
+        result = 0;
+        do {
+          b = encodedPath.charAt(index++) - 63;
+          result |= (b & 0x1f) << shift;
+          shift += 5;
+        } while (b >= 0x20);
+        int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+        lng += dlng;
+
+        LatLng p = new LatLng(((double) lat / (double) 1E5), ((double) lng / (double) 1E5));
+        poly.add(p);
+        //poly.add(((double) lat / (double) 1E5));
+        //poly.add(((double) lng / (double) 1E5));
+      }
+    }
+    catch (Exception e) {
+      Log.w("GoogleMaps", "decodePoly error");
     }
 
     return poly;
