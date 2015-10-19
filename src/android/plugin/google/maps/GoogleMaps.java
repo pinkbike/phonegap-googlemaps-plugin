@@ -1295,13 +1295,16 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
       Point swPoint = new Point(tapPoint);
       int size = (int)(20*density);
       swPoint.offset(-size, size);
-      LatLng sw = map.getProjection().fromScreenLocation(swPoint);
+      LatLng bottomleft = map.getProjection().fromScreenLocation(swPoint);
 
       Point nePoint = new Point(tapPoint);
       nePoint.offset(size, -size);
-      LatLng ne = map.getProjection().fromScreenLocation(nePoint);
+      LatLng topright = map.getProjection().fromScreenLocation(nePoint);
 
-      LatLngBounds tapBounds = new LatLngBounds(sw, ne);
+      LatLngBounds.Builder builder = new LatLngBounds.Builder();
+      builder.include(bottomleft);
+      builder.include(topright);
+      LatLngBounds tapBounds = builder.build();
 
       HashMap<String, Double> matches = new HashMap<String, Double>();
       double pointDistance;
