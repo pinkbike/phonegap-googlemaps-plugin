@@ -65,6 +65,7 @@ public class MyPlugin extends CordovaPlugin implements MyPluginInterface  {
     return (Circle)this.objects.get(id);
   }
 
+
   protected GroundOverlay getGroundOverlay(String id) {
     return (GroundOverlay)this.objects.get(id);
   }

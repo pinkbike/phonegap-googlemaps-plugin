@@ -47,7 +47,7 @@
 
   polygon.strokeWidth = [[json valueForKey:@"strokeWidth"] floatValue];
   polygon.zIndex = [[json valueForKey:@"zIndex"] floatValue];
-
+    
   if ([[json valueForKey:@"tappable"] boolValue]) {
     polygon.tappable = YES;
   }

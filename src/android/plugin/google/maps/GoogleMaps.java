@@ -141,7 +141,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
       ApplicationInfo appInfo = manager.getApplicationInfo(activity.getPackageName(), 0);
       isRelease = !((appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) == ApplicationInfo.FLAG_DEBUGGABLE);
     } catch (Exception e) {}
-
+    
     //Log.i("CordovaLog", "This app uses phonegap-googlemaps-plugin version " + PLUGIN_VERSION);
 
     if (!isRelease) {
@@ -150,7 +150,9 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
         public void run() {
   
           try {
+            
             /*
+              
             JSONArray params = new JSONArray();
             params.put("get");
             params.put("http://plugins.cordova.io/api/plugin.google.maps");
@@ -168,7 +170,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
                       Log.i("CordovaLog", "phonegap-googlemaps-plugin version " + latestVersion + " is available.");
                     }
                   } catch (JSONException e) {}
-  
+                  
                 }
               }
             });

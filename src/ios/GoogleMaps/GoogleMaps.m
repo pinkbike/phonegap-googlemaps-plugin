@@ -226,7 +226,6 @@
 
 
 - (void)exec:(CDVInvokedUrlCommand *)command {
-
     
     [self.commandDelegate runInBackground:^{
         

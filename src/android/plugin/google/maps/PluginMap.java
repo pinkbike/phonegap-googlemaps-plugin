@@ -32,7 +32,7 @@ public class PluginMap extends MyPlugin {
   @SuppressWarnings("unused")
   private void setOptions(JSONArray args, CallbackContext callbackContext) throws JSONException {
 
-
+    
     UiSettings settings = this.map.getUiSettings();
     JSONObject params = args.getJSONObject(1);
     //controls
@@ -55,7 +55,7 @@ public class PluginMap extends MyPlugin {
         map.setMyLocationEnabled(controls.getBoolean("myLocation"));
       }
     }
-
+    
     //gestures
     if (params.has("gestures")) {
       JSONObject gestures = params.getJSONObject("gestures");
@@ -74,7 +74,7 @@ public class PluginMap extends MyPlugin {
         settings.setZoomGesturesEnabled(gestures.getBoolean("zoom"));
       }
     }
-
+    
     // map type
     if (params.has("mapType")) {
       String typeStr = params.getString("mapType");
@@ -93,7 +93,7 @@ public class PluginMap extends MyPlugin {
         this.map.setMapType(mapTypeId);
       }
     }
-
+    
     //controls
     Boolean isEnabled = true;
 
@@ -117,10 +117,10 @@ public class PluginMap extends MyPlugin {
       CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(builder.build());
       map.moveCamera(cameraUpdate);
     }
-
+    
     this.sendNoResult(callbackContext);
   }
-
+  
   /**
    * Set center location of the marker
    * @param args
@@ -191,7 +191,7 @@ public class PluginMap extends MyPlugin {
    * @throws JSONException
    */
   private void updateCameraPosition(final String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-
+    
     int durationMS = 4000;
     CameraPosition.Builder builder = CameraPosition.builder();
     JSONObject cameraPos = args.getJSONObject(1);
@@ -218,7 +218,7 @@ public class PluginMap extends MyPlugin {
         JSONArray points = cameraPos.getJSONArray("target");
         LatLngBounds bounds = PluginUtil.JSONArray2LatLngBounds(points);
         cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, (int)(20 * this.density));
-
+        
       } else {
         latLng = cameraPos.getJSONObject("target");
         builder.target(new LatLng(latLng.getDouble("lat"), latLng.getDouble("lng")));
@@ -230,7 +230,7 @@ public class PluginMap extends MyPlugin {
       cameraUpdate = CameraUpdateFactory.newCameraPosition(builder.build());
     }
 
-
+    
     if (action.equals("moveCamera")) {
       myMoveCamera(cameraUpdate, callbackContext);
     } else {
@@ -264,11 +264,11 @@ public class PluginMap extends MyPlugin {
     int y = args.getInt(2);
     float xPixel = -x * this.density;
     float yPixel = -y * this.density;
-
+    
     CameraUpdate cameraUpdate = CameraUpdateFactory.scrollBy(xPixel, yPixel);
     map.animateCamera(cameraUpdate);
   }
-
+  
   /**
    * Move the camera of the map
    * @param cameraPosition
@@ -382,7 +382,7 @@ public class PluginMap extends MyPlugin {
       callbackContext.error("Unknow MapTypeID is specified:" + typeStr);
       return;
     }
-
+    
     final int myMapTypeId = mapTypeId;
     map.setMapType(myMapTypeId);
     this.sendNoResult(callbackContext);
@@ -414,7 +414,7 @@ public class PluginMap extends MyPlugin {
       map.animateCamera(cameraUpdate, callback);
     }
   }
-
+  
 
   /**
    * Return the current position of the camera
@@ -434,10 +434,10 @@ public class PluginMap extends MyPlugin {
     json.put("tilt", camera.tilt);
     json.put("bearing", camera.bearing);
     json.put("hashCode", camera.hashCode());
-
+    
     callbackContext.success(json);
   }
-
+  
   /**
    * Return the image data encoded with base64
    * @param args
@@ -447,14 +447,14 @@ public class PluginMap extends MyPlugin {
   @SuppressWarnings("unused")
   private void toDataURL(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
     this.map.snapshot(new GoogleMap.SnapshotReadyCallback() {
-
+      
       @Override
       public void onSnapshotReady(Bitmap image) {
         float density = Resources.getSystem().getDisplayMetrics().density;
         image = PluginUtil.resizeBitmap(image,
                                         (int)(image.getWidth() / density),
                                         (int)(image.getHeight() / density));
-
+        
         if (image != null) {
           ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
           image.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
@@ -469,9 +469,8 @@ public class PluginMap extends MyPlugin {
         }
       }
     });
-
+    
   }
-
   @SuppressWarnings({ "unused" })
   private void fromLatLngToPoint(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
     double lat, lng;
@@ -484,7 +483,7 @@ public class PluginMap extends MyPlugin {
     pointJSON.put(point.y / this.density);
     callbackContext.success(pointJSON);
   }
-
+  
   @SuppressWarnings("unused")
   private void fromPointToLatLng(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
     int pointX, pointY;
@@ -499,7 +498,7 @@ public class PluginMap extends MyPlugin {
     pointJSON.put(latlng.longitude);
     callbackContext.success(pointJSON);
   }
-
+  
   /**
    * Return the visible region of the map
    * Thanks @fschmidt
@@ -517,14 +516,15 @@ public class PluginMap extends MyPlugin {
     southwest.put("lng", latLngBounds.southwest.longitude);
     result.put("northeast", northeast);
     result.put("southwest", southwest);
-
+    
     JSONArray latLngArray = new JSONArray();
     latLngArray.put(northeast);
     latLngArray.put(southwest);
     result.put("latLngArray", latLngArray);
-
+    
     callbackContext.success(result);
   }
+  
 
   /**
    * Sets the preference for whether all gestures should be enabled or disabled.

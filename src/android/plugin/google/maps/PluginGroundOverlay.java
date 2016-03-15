@@ -24,7 +24,7 @@ public class PluginGroundOverlay extends MyPlugin {
 
   /**
    * Create ground overlay
-   *
+   * 
    * @param args
    * @param callbackContext
    * @throws JSONException
@@ -34,7 +34,7 @@ public class PluginGroundOverlay extends MyPlugin {
     JSONObject opts = args.getJSONObject(1);
     _createGroundOverlay(opts, callbackContext);
   }
-
+  
   private void _createGroundOverlay(final JSONObject opts, final CallbackContext callbackContext) throws JSONException {
     GroundOverlayOptions options = new GroundOverlayOptions();
 
@@ -82,7 +82,7 @@ public class PluginGroundOverlay extends MyPlugin {
         try {
           result.put("hashCode", groundOverlay.hashCode());
           result.put("id", id);
-
+          
           PluginGroundOverlay.this.objects.put("gOverlay_property_" + groundOverlay.getId(), opts);
         } catch (Exception e) {}
         callbackContext.success(result);
@@ -92,7 +92,7 @@ public class PluginGroundOverlay extends MyPlugin {
       public void onError(String errorMsg) {
         callbackContext.error(errorMsg);
       }
-
+      
     });
   }
   @SuppressWarnings("resource")
@@ -103,8 +103,8 @@ public class PluginGroundOverlay extends MyPlugin {
     }
 
     String filePath = url;
-    if (filePath.indexOf("://") == -1 &&
-        filePath.startsWith("/") == false &&
+    if (filePath.indexOf("://") == -1 && 
+        filePath.startsWith("/") == false && 
         filePath.startsWith("www/") == false) {
       filePath = "./" + filePath;
     }
@@ -113,13 +113,13 @@ public class PluginGroundOverlay extends MyPlugin {
       currentPage = currentPage.replaceAll("[^\\/]*$", "");
       filePath = filePath.replace("./", currentPage);
     }
-
-
+    
+    
     //=================================
     // Load the image from the Internet
     //=================================
     if (filePath.indexOf("http") == 0) {
-
+      
       AsyncLoadImage task = new AsyncLoadImage(new AsyncLoadImageInterface() {
 
         @Override
@@ -137,12 +137,12 @@ public class PluginGroundOverlay extends MyPlugin {
             callback.onError("Can not load image from " + url);
           }
         }
-
+      
       });
       task.execute(filePath);
       return;
     }
-
+    
     InputStream inputStream;
     if (filePath.indexOf("/") == 0 ||
         (filePath.indexOf("file://") == 0 && filePath.indexOf("file:///android_asset/") == -1) ||
@@ -153,7 +153,7 @@ public class PluginGroundOverlay extends MyPlugin {
       if (filePath.indexOf("file://") == 0) {
         filePath = filePath.replace("file://", "");
       }
-
+      
       try {
         inputStream = new FileInputStream(filePath);
       } catch (FileNotFoundException e) {
@@ -174,12 +174,12 @@ public class PluginGroundOverlay extends MyPlugin {
         return;
       }
     }
-
-
+    
+    
     try {
       Bitmap image = null;
       image = BitmapFactory.decodeStream(inputStream);
-
+      
       BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(image);
       if (bitmapDescriptor != null) {
         options.image(bitmapDescriptor);
@@ -199,7 +199,7 @@ public class PluginGroundOverlay extends MyPlugin {
    * Remove this tile layer
    * @param args
    * @param callbackContext
-   * @throws JSONException
+   * @throws JSONException 
    */
   protected void remove(JSONArray args, CallbackContext callbackContext) throws JSONException {
     String id = args.getString(1);
@@ -214,7 +214,6 @@ public class PluginGroundOverlay extends MyPlugin {
 
     String propertyId = "gOverlay_property_" + id;
     this.objects.remove(propertyId);
-
     groundOverlay.remove();
     this.sendNoResult(callbackContext);
   }
@@ -223,7 +222,7 @@ public class PluginGroundOverlay extends MyPlugin {
    * Set visibility for the object
    * @param args
    * @param callbackContext
-   * @throws JSONException
+   * @throws JSONException 
    */
   protected void setVisible(JSONArray args, CallbackContext callbackContext) throws JSONException {
     boolean visible = args.getBoolean(2);
