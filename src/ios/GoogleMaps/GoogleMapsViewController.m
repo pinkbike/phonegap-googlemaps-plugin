@@ -275,7 +275,7 @@ NSDictionary *initOptions;
       return YES;
     }
   }
-  return NO;
+      return NO;
 }
 
 - (void)mapView:(GMSMapView *)mapView didTapOverlay:(GMSOverlay *)overlay {
@@ -408,7 +408,7 @@ NSDictionary *initOptions;
 		
         NSNumberFormatter *nf = [[NSNumberFormatter alloc] init];
         BOOL isNumeric = [nf numberFromString:widthString] != nil;
-	
+        
 		if ([widthString hasSuffix:@"%"]) {
 			double widthDouble = [[widthString stringByReplacingOccurrencesOfString:@"%" withString:@""] doubleValue];
 			
@@ -501,7 +501,7 @@ NSDictionary *initOptions;
   } else {
     rectSize.width += sizeEdgeWidth;
   }
-
+	
 	if (width > 0) {
 		rectSize.width = width;
 	}
@@ -745,7 +745,7 @@ NSDictionary *initOptions;
   
   NSError *error;
   NSData *data = [NSJSONSerialization dataWithJSONObject:result options:NSJSONWritingPrettyPrinted error:&error];
-
+  
   NSString *JSONstring = [[NSString alloc] initWithData:data
                                            encoding:NSUTF8StringEncoding];
   NSString *jsString = [NSString stringWithFormat:@"javascript:plugin.google.maps.Map._onMapEvent('indoor_level_activated', %@)", JSONstring];

@@ -83,7 +83,7 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     final PolylineOptions polylineOptions = new PolylineOptions();
     int color;
     LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
+    
     String encryptedPath;
     if (opts.has("encodedPath")) {
       encryptedPath = opts.getString("encodedPath");
@@ -133,7 +133,7 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
 
     String boundsId = "polyline_bounds_" + polyline.getId();
     this.objects.put(boundsId, builder.build());
-
+    
     result.put("hashCode", polyline.hashCode());
     result.put("id", id);
 
@@ -156,7 +156,7 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     JSONObject result = this.buildPolyline(opts);
     callbackContext.success(result);
   }
-
+  
   /**
    * Create polylines
    * @param args
@@ -294,7 +294,7 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
   
         if (posLons.size() >= 2) {
           options.addAll(posLons);
-        }
+        } 
   
         if (connect.size() >= 2) {
           options.addAll(connect);
@@ -409,7 +409,7 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
    * Set visibility for the object
    * @param args
    * @param callbackContext
-   * @throws JSONException
+   * @throws JSONException 
    */
   @SuppressWarnings("unused")
   private void setVisible(JSONArray args, CallbackContext callbackContext) throws JSONException {

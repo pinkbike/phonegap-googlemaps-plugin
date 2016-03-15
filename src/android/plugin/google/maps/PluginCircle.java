@@ -50,7 +50,7 @@ public class PluginCircle extends MyPlugin  {
     Circle circle = map.addCircle(circleOptions);
     String id = "circle_" + circle.getId();
     this.objects.put(id, circle);
-
+    
     if (opts.has("tappable") && opts.getBoolean("tappable")) {
       this.tappables.put(id, true);
     }

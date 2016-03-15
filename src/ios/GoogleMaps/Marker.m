@@ -379,7 +379,7 @@
 {
     NSString *markerKey = [command.arguments objectAtIndex:1];
     GMSMarker *marker = [self.mapCtrl getMarkerByKey: markerKey];
-
+    
     float latitude = [[command.arguments objectAtIndex:2] floatValue];
     float longitude = [[command.arguments objectAtIndex:3] floatValue];
     CLLocationCoordinate2D position = CLLocationCoordinate2DMake(latitude, longitude);

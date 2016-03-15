@@ -1273,7 +1273,6 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
                             pt2.latitude, pt2.longitude, results);
     return results[0];
   }
-
   /**
    * Notify map click event to JS, also checks for click on a polygon and triggers onPolygonEvent
    * @param point

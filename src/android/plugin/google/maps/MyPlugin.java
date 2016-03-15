@@ -56,7 +56,7 @@ public class MyPlugin extends CordovaPlugin implements MyPluginInterface  {
       return false;
     }
   }
-
+  
   protected boolean isTappable(String id) {
     return this.tappables.containsKey(id);
   }

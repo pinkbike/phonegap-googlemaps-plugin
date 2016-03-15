@@ -226,7 +226,7 @@ public class PluginGroundOverlay extends MyPlugin {
    */
   protected void setVisible(JSONArray args, CallbackContext callbackContext) throws JSONException {
     boolean visible = args.getBoolean(2);
-
+    
     String id = args.getString(1);
     GroundOverlay groundOverlay = (GroundOverlay)this.objects.get(id);
     if (groundOverlay == null) {
@@ -236,27 +236,27 @@ public class PluginGroundOverlay extends MyPlugin {
     groundOverlay.setVisible(visible);
     this.sendNoResult(callbackContext);
   }
-
+  
 
   /**
    * Set image of the ground-overlay
    * @param args
    * @param callbackContext
-   * @throws JSONException
+   * @throws JSONException 
    */
   @SuppressWarnings("unused")
   private void setImage(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
     String id = args.getString(1);
     GroundOverlay groundOverlay = (GroundOverlay)this.objects.get(id);
     String url = args.getString(2);
-
+    
     String propertyId = "gOverlay_property_" + id;
     JSONObject opts = (JSONObject) this.objects.get(propertyId);
     opts.put("url", url);
-
+    
     _createGroundOverlay(opts, callbackContext);
   }
-
+  
 
   /**
    * Set bounds
@@ -268,7 +268,7 @@ public class PluginGroundOverlay extends MyPlugin {
   private void setBounds(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
     String id = args.getString(1);
     GroundOverlay groundOverlay = (GroundOverlay)this.objects.get(id);
-
+    
     JSONArray points = args.getJSONArray(2);
     LatLngBounds bounds = PluginUtil.JSONArray2LatLngBounds(points);
     groundOverlay.setPositionFromBounds(bounds);
@@ -280,7 +280,7 @@ public class PluginGroundOverlay extends MyPlugin {
    * Set opacity
    * @param args
    * @param callbackContext
-   * @throws JSONException
+   * @throws JSONException 
    */
   @SuppressWarnings("unused")
   private void setOpacity(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
@@ -292,7 +292,7 @@ public class PluginGroundOverlay extends MyPlugin {
    * Set bearing
    * @param args
    * @param callbackContext
-   * @throws JSONException
+   * @throws JSONException 
    */
   @SuppressWarnings("unused")
   private void setBearing(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
