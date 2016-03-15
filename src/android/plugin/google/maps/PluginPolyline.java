@@ -362,7 +362,7 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     }
     this.objects.remove(id);
     this.tappables.remove(id);
-
+    
     id = "polyline_bounds_" + polyline.getId();
     this.objects.remove(id);
     

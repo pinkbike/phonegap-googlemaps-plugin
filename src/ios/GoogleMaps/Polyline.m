@@ -106,13 +106,12 @@
   else {
     polyline.tappable = NO;
   }
-
+  
   NSString *id = [NSString stringWithFormat:@"polyline_%lu", (unsigned long)polyline.hash];
   [self.mapCtrl.overlayManager setObject:polyline forKey: id];
   polyline.title = id;
 
   [result setObject:id forKey:@"id"];
-
   [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)polyline.hash] forKey:@"hashCode"];
 
   return result;

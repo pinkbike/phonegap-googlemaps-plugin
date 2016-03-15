@@ -388,7 +388,7 @@
     [CATransaction setDisableActions:YES];
     [marker setPosition:position];
     [CATransaction commit];
-
+    
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }

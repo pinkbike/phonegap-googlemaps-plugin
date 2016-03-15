@@ -275,7 +275,7 @@ NSDictionary *initOptions;
       return YES;
     }
   }
-      return NO;
+	return NO;
 }
 
 - (void)mapView:(GMSMapView *)mapView didTapOverlay:(GMSOverlay *)overlay {

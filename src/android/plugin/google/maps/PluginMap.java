@@ -171,7 +171,7 @@ public class PluginMap extends MyPlugin {
   private void animateCamera(JSONArray args, CallbackContext callbackContext) throws JSONException {
     this.updateCameraPosition("animateCamera", args, callbackContext);
   }
-
+  
   /**
    * Move the camera without animation
    * @param args
@@ -182,7 +182,7 @@ public class PluginMap extends MyPlugin {
   private void moveCamera(JSONArray args, CallbackContext callbackContext) throws JSONException {
     this.updateCameraPosition("moveCamera", args, callbackContext);
   }
-
+  
   /**
    * move the camera
    * @param action
