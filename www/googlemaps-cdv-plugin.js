@@ -2121,40 +2121,6 @@ LatLngBounds.prototype.contains = function(latLng) {
 // Convert HTML color to RGB
 //---------------------------
 function isHTMLColorString(inputValue) {
-  if (!inputValue || typeof inputValue !== "string") {
-    return false;
-  }
-  if (inputValue.match(/^#[0-9A-F]{3}$/i) ||
-      inputValue.match(/^#[0-9A-F]{4}$/i) ||
-      inputValue.match(/^#[0-9A-F]{6}$/i) ||
-      inputValue.match(/^#[0-9A-F]{8}$/i) ||
-      inputValue.match(/^rgba?\([\d,.\s]+\)$/) ||
-      inputValue.match(/^hsla?\([\d%,.\s]+\)$/)) {
-    return true;
-  }
-
-  inputValue = inputValue.toLowerCase();
-  return inputValue in HTML_COLORS;
-}
-
-function HTMLColor2RGBA(colorValue, defaultOpacity) {
-  defaultOpacity = !defaultOpacity ? 1.0 : defaultOpacity;
-  if (colorValue === "transparent" || !colorValue) {
-    return [0, 0, 0, 0];
-  }
-  var alpha = Math.floor(255 * defaultOpacity),
-      matches,
-      result = {
-        r: 0,
-        g: 0,
-        b: 0
-      };
-  var colorStr = colorValue.toLowerCase();
-  if (colorStr in HTML_COLORS) {
-    colorStr = HTML_COLORS[colorStr];
-  }
-  if (colorStr.match(/^#([0-9A-F]){3}$/i)) {
-    matches = colorStr.match(/([0-9A-F])/ig);
     if (!inputValue || typeof inputValue !== "string") {
         return false;
     }
