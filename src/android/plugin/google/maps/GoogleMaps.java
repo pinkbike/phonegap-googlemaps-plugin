@@ -18,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import plugin.http.request.HttpRequest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -122,7 +121,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
   private ViewGroup root;
   private final int CLOSE_LINK_ID = 0x7f999990;  //random
   private final int LICENSE_LINK_ID = 0x7f99991; //random
-  private final String PLUGIN_VERSION = "1.2.5";
+  private final String PLUGIN_VERSION = "1.3.3";
   private MyPluginLayout mPluginLayout = null;
   public boolean isDebug = false;
   private GoogleApiClient googleApiClient = null;
@@ -142,8 +141,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
       ApplicationInfo appInfo = manager.getApplicationInfo(activity.getPackageName(), 0);
       isRelease = !((appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) == ApplicationInfo.FLAG_DEBUGGABLE);
     } catch (Exception e) {}
-
-    Log.i("CordovaLog", "This app uses phonegap-googlemaps-plugin version " + PLUGIN_VERSION);
+    //Log.i("CordovaLog", "This app uses phonegap-googlemaps-plugin version " + PLUGIN_VERSION);
 
     if (!isRelease) {
       cordova.getThreadPool().execute(new Runnable() {
@@ -151,7 +149,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
         public void run() {
 
           try {
-
+            /*
             JSONArray params = new JSONArray();
             params.put("get");
             params.put("http://plugins.cordova.io/api/plugin.google.maps");
@@ -173,6 +171,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
                 }
               }
             });
+            */
           } catch (Exception e) {}
         }
       });
@@ -191,7 +190,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
             e.printStackTrace();
           }
        */
-        if (Build.VERSION.SDK_INT >= 11){
+        if (Build.VERSION.SDK_INT >= 21 || "org.xwalk.core.XWalkView".equals(view.getClass().getName())){
           view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         }
 
@@ -1909,6 +1908,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
 
         if (maxWidth > 0) {
           imageView.setMaxWidth(maxWidth);
+          imageView.setAdjustViewBounds(true);
         }
 
         windowLayer.addView(imageView);
