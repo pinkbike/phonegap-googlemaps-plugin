@@ -8,8 +8,6 @@
 
 #import "GoogleMaps.h"
 #import "MyPlgunProtocol.h"
-#import "RNDecryptor.h"
-#import "RNEncryptor.h"
 
 @interface Polyline : CDVPlugin<MyPlgunProtocol>
 @property (nonatomic, strong) GoogleMapsViewController* mapCtrl;
