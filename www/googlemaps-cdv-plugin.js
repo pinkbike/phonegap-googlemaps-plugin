@@ -2642,7 +2642,7 @@ module.exports = {
     geometry: {
         encoding: {
             decodePath: decodePath,
-            encodePath: encodePath
+            encodePath: encodePath,
             decodePathNative: decodePathNative,
         }
     }
