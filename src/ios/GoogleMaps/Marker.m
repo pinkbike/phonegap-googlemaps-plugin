@@ -612,9 +612,12 @@
         if (range.location == NSNotFound) {
             range = [iconPath rangeOfString:@"www/"];
             if (range.location == NSNotFound) {
-                range = [iconPath rangeOfString:@"/"];
-                if (range.location != 0) {
-                    iconPath = [NSString stringWithFormat:@"./%@", iconPath];
+                range = [iconPath rangeOfString:@"data:image"];
+                if (range.location == NSNotFound) {
+                  range = [iconPath rangeOfString:@"/"];
+                  if (range.location != 0) {
+                      iconPath = [NSString stringWithFormat:@"./%@", iconPath];
+                  }
                 }
             }
         }
