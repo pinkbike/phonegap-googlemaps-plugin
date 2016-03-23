@@ -412,15 +412,10 @@ App.prototype.setWatchDogTimer = function(time) {
 
 };
 
-function onBackbutton() {
-    _mapInstance.closeDialog();
-}
-
 /**
  * @desc Open the map dialog
  */
 App.prototype.showDialog = function() {
-    document.addEventListener("backbutton", onBackbutton, false);
     cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'showDialog', []);
 };
 
@@ -428,7 +423,6 @@ App.prototype.showDialog = function() {
  * @desc Close the map dialog
  */
 App.prototype.closeDialog = function() {
-    document.removeEventListener("backbutton", onBackbutton, false);
     cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'closeDialog', []);
 };
 
@@ -749,13 +743,13 @@ App.prototype.refreshLayout = function() {
 
 App.prototype.isAvailable = function(callback) {
     var self = this;
-
+    
     /*
     var tmpmap = plugin.google.maps.Map.getMap(document.createElement("div"), {});
     tmpmap.remove();
     tmpmap = null;
     */
-
+    
     cordova.exec(function() {
         if (typeof callback === "function") {
             callback.call(self, true);
