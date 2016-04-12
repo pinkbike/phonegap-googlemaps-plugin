@@ -535,25 +535,24 @@ public class PluginMarker extends MyPlugin {
     callbackContext.success(isInfoWndShown ? 1 : 0);
   }
   
-  /**
-   * Remove the marker
-   * @param args
-   * @param callbackContext
-   * @throws JSONException 
-   */
-  @SuppressWarnings("unused")
-  private void remove(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-    String id = args.getString(1);
-    Marker marker = this.getMarker(id);
-    if (marker == null) {
-      callbackContext.success();
-      return;
+  private void removeMultiple(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+    JSONArray markerKeys = args.getJSONArray(1);
+
+    String id;
+    Marker marker;
+    for (i = 0; i < markerKeys.length(); i++) {
+      id = markerKeys.getString(i);
+      marker = this.getMarker(id);
+      if (marker == null) {
+        continue;
+      }
+      marker.remove();
+      this.objects.remove(id);
+
+      id = "marker_property_" + id;
+      this.objects.remove(id);
     }
-    marker.remove();
-    this.objects.remove(id);
-    
-    String propertyId = "marker_property_" + id;
-    this.objects.remove(propertyId);
+
     this.sendNoResult(callbackContext);
   }
   
