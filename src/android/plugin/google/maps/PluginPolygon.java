@@ -1,16 +1,17 @@
 package plugin.google.maps;
 
-import java.util.List;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.PolygonOptions;
+import java.util.LinkedList;
+import java.util.List;
 
 public class PluginPolygon extends MyPlugin implements MyPluginInterface  {
 
@@ -36,6 +37,17 @@ public class PluginPolygon extends MyPlugin implements MyPluginInterface  {
                 builder.include(path.get(i));
             }
         }
+
+        if (opts.has("holes")) {
+            JSONArray holes = opts.getJSONArray("holes");
+            int i;
+            JSONArray latLngArray;
+            for (i = 0; i < holes.length(); i++) {
+                latLngArray = holes.getJSONArray(i);
+                polygonOptions.addHole(PluginUtil.JSONArray2LatLngList(latLngArray));
+            }
+
+        }
         if (opts.has("strokeColor")) {
             color = PluginUtil.parsePluginColor(opts.getJSONArray("strokeColor"));
             polygonOptions.strokeColor(color);
@@ -55,13 +67,6 @@ public class PluginPolygon extends MyPlugin implements MyPluginInterface  {
         }
         if (opts.has("zIndex")) {
             polygonOptions.zIndex(opts.getInt("zIndex"));
-        }
-        if (opts.has("addHole")) {
-            JSONArray points = opts.getJSONArray("addHole");
-            List<LatLng> path = PluginUtil.JSONArray2LatLngList(points);
-            if(path.size() > 0) {
-                polygonOptions.addHole(path);
-            }
         }
 
         Polygon polygon = map.addPolygon(polygonOptions);
@@ -168,6 +173,30 @@ public class PluginPolygon extends MyPlugin implements MyPluginInterface  {
         this.objects.remove(id);
 
         polygon.remove();
+        this.sendNoResult(callbackContext);
+    }
+
+    /**
+     * Set holes
+     * @param args
+     * @param callbackContext
+     * @throws JSONException
+     */
+    @SuppressWarnings("unused")
+    private void setHoles(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+        String id = args.getString(1);
+        Polygon polygon = this.getPolygon(id);
+
+        JSONArray holesJSONArray = args.getJSONArray(2);
+        List<List<LatLng>> holes = new LinkedList<List<LatLng>>();
+
+        for (int i = 0; i < holesJSONArray.length(); i++) {
+            JSONArray holeJSONArray = holesJSONArray.getJSONArray(i);
+            holes.add(PluginUtil.JSONArray2LatLngList(holeJSONArray));
+        }
+
+        polygon.setHoles(holes);
+
         this.sendNoResult(callbackContext);
     }
 
