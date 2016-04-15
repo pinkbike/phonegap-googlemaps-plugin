@@ -288,13 +288,15 @@
  * Remove the polyline
  * @params key
  */
--(void)remove:(CDVInvokedUrlCommand *)command
+-(void)removeMultiple:(CDVInvokedUrlCommand *)command
 {
-  NSString *polylineKey = [command.arguments objectAtIndex:1];
-  GMSPolyline *polyline = [self.mapCtrl getPolylineByKey: polylineKey];
-  polyline.map = nil;
-  [self.mapCtrl removeObjectForKey:polylineKey];
-  polyline = nil;
+  NSArray *polylineKeys = [command.arguments objectAtIndex:1];
+  for (NSString *polylineKey in polylineKeys) {
+    GMSPolyline *polyline = [self.mapCtrl getPolylineByKey: polylineKey];
+    polyline.map = nil;
+    [self.mapCtrl removeObjectForKey:polylineKey];
+    polyline = nil;
+  }
 
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];

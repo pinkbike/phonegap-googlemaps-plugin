@@ -228,22 +228,25 @@
  * Remove the specified marker
  * @params MarkerKey
  */
--(void)remove:(CDVInvokedUrlCommand *)command
+-(void)removeMultiple:(CDVInvokedUrlCommand *)command
 {
-    NSString *markerKey = [command.arguments objectAtIndex:1];
-    GMSMarker *marker = [self.mapCtrl.overlayManager objectForKey:markerKey];
-    NSString *propertyId = [NSString stringWithFormat:@"marker_property_%lu", (unsigned long)marker.hash];
-    marker.map = nil;
-    [self.mapCtrl removeObjectForKey:markerKey];
-    marker = nil;
-    
-    if ([self.mapCtrl.overlayManager objectForKey:propertyId]) {
-        [self.mapCtrl removeObjectForKey:propertyId];
+    NSArray *markerKeys = [command.arguments objectAtIndex:1];
+    for (NSString *markerKey in markerKeys) {
+        GMSMarker *marker = [self.mapCtrl.overlayManager objectForKey:markerKey];
+        NSString *propertyId = [NSString stringWithFormat:@"marker_property_%lu", (unsigned long)marker.hash];
+        marker.map = nil;
+        [self.mapCtrl removeObjectForKey:markerKey];
+        marker = nil;
+
+        if ([self.mapCtrl.overlayManager objectForKey:propertyId]) {
+            [self.mapCtrl removeObjectForKey:propertyId];
+        }
     }
-    
+
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
+
 /**
  * Set anchor of the marker
  * @params MarkerKey

@@ -28,7 +28,7 @@
 - (void)setIcon:(CDVInvokedUrlCommand*)command;
 - (void)setIconAnchor:(CDVInvokedUrlCommand*)command;
 - (void)setInfoWindowAnchor:(CDVInvokedUrlCommand*)command;
-- (void)remove:(CDVInvokedUrlCommand*)command;
+- (void)removeMultiple:(CDVInvokedUrlCommand*)command;
 - (void)setPosition:(CDVInvokedUrlCommand*)command;
 - (void)setRotation:(CDVInvokedUrlCommand*)command;
 - (void)setAnimation:(CDVInvokedUrlCommand*)command;

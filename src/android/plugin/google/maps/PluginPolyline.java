@@ -347,28 +347,37 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
   
 
   /**
-   * Remove the polyline
+   * Remove polylines
    * @param args
    * @param callbackContext
    * @throws JSONException
    */
   @SuppressWarnings("unused")
-  private void remove(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-    String id = args.getString(1);
-    Polyline polyline = this.getPolyline(id);
-    if (polyline == null) {
-      this.sendNoResult(callbackContext);
-      return;
+  private void removeMultiple(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+    JSONArray polylineKeys = args.getJSONArray(1);
+
+    String id;
+    Polyline polyline;
+    int i;
+    for (i = 0; i < polylineKeys.length(); i++) {
+      id = polylineKeys.getString(i);
+      polyline = this.getPolyline(id);
+      if (polyline == null) {
+        continue;
+      }
+      this.objects.remove(id);
+      this.tappables.remove(id);
+
+      id = "polyline_bounds_" + polyline.getId();
+      this.objects.remove(id);
+
+      polyline.remove();
     }
-    this.objects.remove(id);
-    this.tappables.remove(id);
-    
-    id = "polyline_bounds_" + polyline.getId();
-    this.objects.remove(id);
-    
-    polyline.remove();
-    this.sendNoResult(callbackContext);
+
+    //this.sendNoResult(callbackContext);
+    callbackContext.success(1);
   }
+
   /**
    * Set points
    * @param args
