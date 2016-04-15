@@ -20,7 +20,6 @@
 - (void)setZIndex:(CDVInvokedUrlCommand*)command;
 - (void)setVisible:(CDVInvokedUrlCommand*)command;
 - (void)remove:(CDVInvokedUrlCommand*)command;
-- (void)removeMultiple:(CDVInvokedUrlCommand*)command;
 - (void)setGeodesic:(CDVInvokedUrlCommand*)command;
 
 @end
