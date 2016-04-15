@@ -3,7 +3,6 @@ package plugin.google.maps;
 import java.io.ByteArrayOutputStream;
 
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,9 +10,7 @@ import org.json.JSONObject;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Point;
-import android.os.Handler;
 import android.util.Base64;
-import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -102,7 +99,6 @@ public class PluginMap extends MyPlugin {
 
     // move the camera position
     if (params.has("camera")) {
-      LatLngBounds cameraBounds = null;
       JSONObject camera = params.getJSONObject("camera");
       Builder builder = CameraPosition.builder();
       if (camera.has("bearing")) {
@@ -112,32 +108,14 @@ public class PluginMap extends MyPlugin {
         JSONObject latLng = camera.getJSONObject("latLng");
         builder.target(new LatLng(latLng.getDouble("lat"), latLng.getDouble("lng")));
       }
-
-      if (camera.has("target")) {
-        CameraPosition newPosition;
-        Object target = camera.get("target");
-        @SuppressWarnings("rawtypes")
-        Class targetClass = target.getClass();
-        if ("org.json.JSONArray".equals(targetClass.getName())) {
-          JSONArray points = camera.getJSONArray("target");
-          cameraBounds = PluginUtil.JSONArray2LatLngBounds(points);
-          builder.target(cameraBounds.getCenter());
-
-        } else {
-          JSONObject latLng = camera.getJSONObject("target");
-          builder.target(new LatLng(latLng.getDouble("lat"), latLng.getDouble("lng")));
-        }
-      }
       if (camera.has("tilt")) {
         builder.tilt((float) camera.getDouble("tilt"));
       }
       if (camera.has("zoom")) {
         builder.zoom((float) camera.getDouble("zoom"));
       }
-      map.moveCamera(CameraUpdateFactory.newCameraPosition(builder.build()));
-      if (cameraBounds != null) {
-        mapCtrl.fitBounds(cameraBounds);
-      }
+      CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(builder.build());
+      map.moveCamera(cameraUpdate);
     }
     
     this.sendNoResult(callbackContext);
@@ -216,7 +194,7 @@ public class PluginMap extends MyPlugin {
     
     int durationMS = 4000;
     CameraPosition.Builder builder = CameraPosition.builder();
-    final JSONObject cameraPos = args.getJSONObject(1);
+    JSONObject cameraPos = args.getJSONObject(1);
     if (cameraPos.has("tilt")) {
       builder.tilt((float) cameraPos.getDouble("tilt"));
     }
@@ -231,7 +209,6 @@ public class PluginMap extends MyPlugin {
     }
     CameraPosition newPosition;
     CameraUpdate cameraUpdate = null;
-    LatLngBounds cameraBounds = null;
     if (cameraPos.has("target")) {
       Object target = cameraPos.get("target");
       @SuppressWarnings("rawtypes")
@@ -239,8 +216,9 @@ public class PluginMap extends MyPlugin {
       JSONObject latLng;
       if ("org.json.JSONArray".equals(targetClass.getName())) {
         JSONArray points = cameraPos.getJSONArray("target");
-        cameraBounds = PluginUtil.JSONArray2LatLngBounds(points);
-        cameraUpdate = CameraUpdateFactory.newLatLngBounds(cameraBounds, (int)(20 * this.density));
+        LatLngBounds bounds = PluginUtil.JSONArray2LatLngBounds(points);
+        cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, (int)(20 * this.density));
+        
       } else {
         latLng = cameraPos.getJSONObject("target");
         builder.target(new LatLng(latLng.getDouble("lat"), latLng.getDouble("lng")));
@@ -252,41 +230,11 @@ public class PluginMap extends MyPlugin {
       cameraUpdate = CameraUpdateFactory.newCameraPosition(builder.build());
     }
 
-    final LatLngBounds finalCameraBounds = cameraBounds;
-    PluginUtil.MyCallbackContext myCallback = new PluginUtil.MyCallbackContext("moveCamera", webView) {
-      @Override
-      public void onResult(final PluginResult pluginResult) {
-        if (finalCameraBounds != null) {
-          CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(finalCameraBounds, (int)density);
-          map.moveCamera(cameraUpdate);
-
-
-          Builder builder = CameraPosition.builder();
-          if (cameraPos.has("tilt")) {
-            try {
-              builder.tilt((float) cameraPos.getDouble("tilt"));
-            } catch (JSONException e) {
-              e.printStackTrace();
-            }
-          }
-          if (cameraPos.has("bearing")) {
-            try {
-              builder.bearing((float) cameraPos.getDouble("bearing"));
-            } catch (JSONException e) {
-              e.printStackTrace();
-            }
-          }
-          builder.zoom(map.getCameraPosition().zoom);
-          builder.target(map.getCameraPosition().target);
-          map.moveCamera(CameraUpdateFactory.newCameraPosition(builder.build()));
-        }
-        callbackContext.sendPluginResult(pluginResult);
-      }
-    };
+    
     if (action.equals("moveCamera")) {
-      myMoveCamera(cameraUpdate, myCallback);
+      myMoveCamera(cameraUpdate, callbackContext);
     } else {
-      myAnimateCamera(cameraUpdate, durationMS, myCallback);
+      myAnimateCamera(cameraUpdate, durationMS, callbackContext);
     }
   }
 
@@ -431,7 +379,7 @@ public class PluginMap extends MyPlugin {
         : mapTypeId;
 
     if (mapTypeId == -1) {
-      callbackContext.error("Unknown MapTypeID is specified:" + typeStr);
+      callbackContext.error("Unknow MapTypeID is specified:" + typeStr);
       return;
     }
     
@@ -498,32 +446,27 @@ public class PluginMap extends MyPlugin {
    */
   @SuppressWarnings("unused")
   private void toDataURL(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-
-    JSONObject params = args.getJSONObject(1);
-    boolean uncompress = false;
-    if (params.has("uncompress")) {
-      uncompress = params.getBoolean("uncompress");
-    }
-    final boolean finalUncompress = uncompress;
-
-
     this.map.snapshot(new GoogleMap.SnapshotReadyCallback() {
       
       @Override
       public void onSnapshotReady(Bitmap image) {
-        if (!finalUncompress) {
-          float density = Resources.getSystem().getDisplayMetrics().density;
-          image = PluginUtil.resizeBitmap(image,
-              (int) (image.getWidth() / density),
-              (int) (image.getHeight() / density));
-        }
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();  
-        image.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-        byte[] byteArray = outputStream.toByteArray();
-        String imageEncoded = "data:image/png;base64," + 
-                Base64.encodeToString(byteArray, Base64.NO_WRAP);
+        float density = Resources.getSystem().getDisplayMetrics().density;
+        image = PluginUtil.resizeBitmap(image,
+                                        (int)(image.getWidth() / density),
+                                        (int)(image.getHeight() / density));
         
-        callbackContext.success(imageEncoded);
+        if (image != null) {
+          ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+          image.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+          byte[] byteArray = outputStream.toByteArray();
+          String imageEncoded = "data:image/png;base64," +
+                  Base64.encodeToString(byteArray, Base64.NO_WRAP);
+
+          callbackContext.success(imageEncoded);
+        }
+        else {
+          callbackContext.error("Cannot convert to data url");
+        }
       }
     });
     
