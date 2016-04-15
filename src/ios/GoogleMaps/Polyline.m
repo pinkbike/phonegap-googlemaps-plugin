@@ -288,14 +288,36 @@
  * Remove the polyline
  * @params key
  */
+-(void)remove:(NSString *)polylineKey
+{
+  GMSPolyline *polyline = [self.mapCtrl getPolylineByKey: polylineKey];
+  polyline.map = nil;
+  [self.mapCtrl removeObjectForKey:polylineKey];
+  polyline = nil;
+}
+
+/**
+ * Remove the polyline
+ * @params key
+ */
+-(void)removeSingle:(CDVInvokedUrlCommand *)command
+{
+  NSString *polylineKey = [command.arguments objectAtIndex:1];
+  [self remove:polylineKey];
+
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+/**
+ * Remove the polyline
+ * @params key
+ */
 -(void)removeMultiple:(CDVInvokedUrlCommand *)command
 {
   NSArray *polylineKeys = [command.arguments objectAtIndex:1];
   for (NSString *polylineKey in polylineKeys) {
-    GMSPolyline *polyline = [self.mapCtrl getPolylineByKey: polylineKey];
-    polyline.map = nil;
-    [self.mapCtrl removeObjectForKey:polylineKey];
-    polyline = nil;
+    [self remove:polylineKey];
   }
 
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
