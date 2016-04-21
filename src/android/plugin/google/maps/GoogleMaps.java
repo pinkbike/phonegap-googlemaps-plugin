@@ -1011,13 +1011,13 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
               break;
             }
             else {
-              JSONObject result = new JSONObject();
+              JSONObject jsResult = new JSONObject();
               try {
-                result.put("status", false);
-                result.put("error_code", "service_denied");
-                result.put("error_message", "This app has been rejected to use Location Services.");
+                jsResult.put("status", false);
+                jsResult.put("error_code", "service_denied");
+                jsResult.put("error_message", "This app has been rejected to use Location Services.");
               } catch (JSONException e) {}
-              callbackContext.error(result);
+              callbackContext.error(jsResult);
             }
             
           case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
