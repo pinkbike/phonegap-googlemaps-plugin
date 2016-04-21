@@ -910,6 +910,12 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
     }
     final boolean enableHighAccuracy = isHigh;
     
+    boolean showError = false;
+    if (params.has("showErrorDialog")) {
+      showError = params.getBoolean("showErrorDialog");
+    }
+    final boolean showErrorDialog = showError;
+
     if (googleApiClient == null) {
       googleApiClient = new GoogleApiClient.Builder(this.activity)
         .addApi(LocationServices.API)
@@ -920,7 +926,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
             Log.e("CordovaLog", "===> onConnected");
             GoogleMaps.this.sendNoResult(callbackContext);
             
-            _checkLocationSettings(enableHighAccuracy, callbackContext);
+            _checkLocationSettings(enableHighAccuracy, showErrorDialog, callbackContext);
           }
   
           @Override
@@ -946,12 +952,12 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
         .build();
       googleApiClient.connect();
     } else if (googleApiClient.isConnected()) {
-      _checkLocationSettings(enableHighAccuracy, callbackContext);
+      _checkLocationSettings(enableHighAccuracy, showErrorDialog, callbackContext);
     }
     
   }
 
-  private void _checkLocationSettings(final boolean enableHighAccuracy, final CallbackContext callbackContext) {
+  private void _checkLocationSettings(final boolean enableHighAccuracy, final boolean showErrorDialog, final CallbackContext callbackContext) {
 
     LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
     
@@ -980,28 +986,39 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
             break;
             
           case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-            // Location settings are not satisfied. But could be fixed by showing the user
-            // a dialog.
-            try {
-              //Keep the callback id
-              Bundle bundle = new Bundle();
-              bundle.putInt("type", ACTIVITY_LOCATION_DIALOG);
-              bundle.putString("callbackId", callbackContext.getCallbackId());
-              bundle.putBoolean("enableHighAccuracy", enableHighAccuracy);
-              int hashCode = bundle.hashCode();
-              
-              bufferForLocationDialog.put("bundle_" + hashCode, bundle);
-              GoogleMaps.this.sendNoResult(callbackContext);
+            if (showErrorDialog) {
+              // Location settings are not satisfied. But could be fixed by showing the user
+              // a dialog.
+              try {
+                //Keep the callback id
+                Bundle bundle = new Bundle();
+                bundle.putInt("type", ACTIVITY_LOCATION_DIALOG);
+                bundle.putString("callbackId", callbackContext.getCallbackId());
+                bundle.putBoolean("enableHighAccuracy", enableHighAccuracy);
+                int hashCode = bundle.hashCode();
+                
+                bufferForLocationDialog.put("bundle_" + hashCode, bundle);
+                GoogleMaps.this.sendNoResult(callbackContext);
 
-              // Show the dialog by calling startResolutionForResult(),
-              // and check the result in onActivityResult().
-              cordova.setActivityResultCallback(GoogleMaps.this);
-              status.startResolutionForResult(cordova.getActivity(), hashCode);
-            } catch (SendIntentException e) {
-              // Show the dialog that is original version of this plugin.
-              _showLocationSettingsPage(enableHighAccuracy, callbackContext);
+                // Show the dialog by calling startResolutionForResult(),
+                // and check the result in onActivityResult().
+                cordova.setActivityResultCallback(GoogleMaps.this);
+                status.startResolutionForResult(cordova.getActivity(), hashCode);
+              } catch (SendIntentException e) {
+                // Show the dialog that is original version of this plugin.
+                _showLocationSettingsPage(enableHighAccuracy, callbackContext);
+              }
+              break;
             }
-            break;
+            else {
+              JSONObject result = new JSONObject();
+              try {
+                result.put("status", false);
+                result.put("error_code", "service_denied");
+                result.put("error_message", "This app has been rejected to use Location Services.");
+              } catch (JSONException e) {}
+              callbackContext.error(result);
+            }
             
           case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
             // Location settings are not satisfied. However, we have no way to fix the

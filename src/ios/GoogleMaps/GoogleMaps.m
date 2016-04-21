@@ -575,11 +575,20 @@
         // kCLAuthorizationStatusDenied
         // kCLAuthorizationStatusRestricted
         //----------------------------------------------------
-        UIAlertView *alertView = [[UIAlertView alloc]
-                                  initWithTitle:@"Location Services disabled"
-                                  message:@"This app needs access to your location. Please turn on Location Services in your device settings."
-                                  delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alertView show];
+
+        NSDictionary *opts = [command.arguments objectAtIndex:0];
+        BOOL showErrorDialog = YES;
+        if ([opts objectForKey:@"showErrorDialog"]) {
+            showErrorDialog = [[opts objectForKey:@"showErrorDialog"] boolValue];
+        }
+
+        if (showErrorDialog) {
+          UIAlertView *alertView = [[UIAlertView alloc]
+                                    initWithTitle:@"Location Services disabled"
+                                    message:@"This app needs access to your location. Please turn on Location Services in your device settings."
+                                    delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+          [alertView show];
+        }
         
         NSString *error_code = @"service_denied";
         NSString *error_message = @"This app has rejected to use Location Services.";

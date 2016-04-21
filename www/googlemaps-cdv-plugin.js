@@ -583,6 +583,7 @@ App.prototype.getMyLocation = function(params, success_callback, error_callback)
     success_callback = args[1];
     error_callback = args[2];
 
+    params.showErrorDialog = 'showErrorDialog' in params ? params.showErrorDialog : true;
     params.enableHighAccuracy = params.enableHighAccuracy || false;
     var self = this;
     var successHandler = function(location) {
