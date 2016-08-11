@@ -96,7 +96,7 @@ import com.google.android.gms.maps.model.VisibleRegion;
 @SuppressWarnings("deprecation")
 public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, OnMarkerClickListener,
       OnInfoWindowClickListener, OnMapClickListener, OnMapLongClickListener,
-      OnCameraChangeListener, OnMapLoadedCallback, OnMarkerDragListener,
+      OnCameraChangeListener, OnCameraMoveStartedListener, OnMapLoadedCallback, OnMarkerDragListener,
       OnMyLocationButtonClickListener, OnIndoorStateChangeListener, InfoWindowAdapter {
   private final String TAG = "GoogleMapsPlugin";
   private final HashMap<String, PluginEntry> plugins = new HashMap<String, PluginEntry>();
@@ -580,6 +580,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
           
           // Set event listener
           map.setOnCameraChangeListener(GoogleMaps.this);
+          map.setOnCameraMoveStartedListener(this);
           map.setOnInfoWindowClickListener(GoogleMaps.this);
           map.setOnMapClickListener(GoogleMaps.this);
           map.setOnMapLoadedCallback(GoogleMaps.this);
@@ -1654,6 +1655,16 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
       e.printStackTrace();
     }
     webView.loadUrl("javascript:plugin.google.maps.Map._onCameraEvent('camera_change', " + jsonStr + ")");
+  }
+
+  /**
+   * Notify the camera move start event to JS
+   */
+  @Override
+  public void onCameraMoveStarted(int reason) {
+    JSONObject params = new JSONObject();
+    params.put("isDrag", reason == OnCameraMoveStartedListener.REASON_GESTURE);
+    webView.loadUrl("javascript:plugin.google.maps.Map._onMapEvent('will_move', " + jsonStr + ")");
   }
 
   @Override
