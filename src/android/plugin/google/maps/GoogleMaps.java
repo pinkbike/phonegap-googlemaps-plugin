@@ -1664,8 +1664,13 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
   @Override
   public void onCameraMoveStarted(int reason) {
     JSONObject params = new JSONObject();
-    params.put("isDrag", reason == OnCameraMoveStartedListener.REASON_GESTURE);
-    webView.loadUrl("javascript:plugin.google.maps.Map._onMapEvent('will_move', " + jsonStr + ")");
+    String jsonStr = "";
+    String drag = "false";
+
+    if (reason == OnCameraMoveStartedListener.REASON_GESTURE) {
+      drag = "true";
+    }
+    webView.loadUrl("javascript:plugin.google.maps.Map._onMapEvent('will_move', " + drag + ")");
   }
 
   @Override
