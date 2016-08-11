@@ -581,7 +581,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
           
           // Set event listener
           map.setOnCameraChangeListener(GoogleMaps.this);
-          map.setOnCameraMoveStartedListener(this);
+          map.setOnCameraMoveStartedListener(GoogleMaps.this);
           map.setOnInfoWindowClickListener(GoogleMaps.this);
           map.setOnMapClickListener(GoogleMaps.this);
           map.setOnMapLoadedCallback(GoogleMaps.this);
