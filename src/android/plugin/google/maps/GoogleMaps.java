@@ -1419,16 +1419,29 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
     if(polylinePlugin != null) {
       PluginPolyline polylineClass = (PluginPolyline) polylinePlugin.plugin;
 
-      List<LatLng> points ;
+      List<LatLng> points;
+      LatLng polylinePoint;
       Polyline polyline;
-      Point origin = new Point();
-      Point hitArea = new Point();
-      hitArea.x = 1;
-      hitArea.y = 1;
-      Projection projection = map.getProjection();
-      double threshold = this.calculateDistance(
-          projection.fromScreenLocation(origin),
-          projection.fromScreenLocation(hitArea));
+
+      Point tapPoint = map.getProjection().toScreenLocation(point);
+
+      Point swPoint = new Point(tapPoint);
+      int size = (int)(20*density);
+      swPoint.offset(-size, size);
+      LatLng bottomleft = map.getProjection().fromScreenLocation(swPoint);
+
+      Point nePoint = new Point(tapPoint);
+      nePoint.offset(size, -size);
+      LatLng topright = map.getProjection().fromScreenLocation(nePoint);
+
+      LatLngBounds.Builder builder = new LatLngBounds.Builder();
+      builder.include(bottomleft);
+      builder.include(topright);
+      LatLngBounds tapBounds = builder.build();
+
+      HashMap<String, Double> matches = new HashMap<String, Double>();
+      double pointDistance;
+      double prevDistance;
 
       for (HashMap.Entry<String, Object> entry : polylineClass.objects.entrySet()) {
         key = entry.getKey();
@@ -1436,27 +1449,51 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
           key = key.replace("bounds_", "");
           if (polylineClass.isTappable(key)) {
             bounds = (LatLngBounds) entry.getValue();
-            if (bounds.contains(point)) {
-              key = key.replace("bounds_", "");
+            if (this.isBoundsOverlaps(bounds, tapBounds) || this.isBoundsOverlaps(tapBounds, bounds)) {
 
               polyline = polylineClass.getPolyline(key);
               points = polyline.getPoints();
 
-              if (polyline.isGeodesic()) {
-                if (this.isPointOnTheGeodesicLine(points, point, threshold)) {
-                  hitPoly = true;
-                  this.onPolylineClick(polyline, point);
-                }
-              } else {
-                if (this.isPointOnTheLine(points, point)) {
-                  hitPoly = true;
-                  this.onPolylineClick(polyline, point);
+              for (int i = 0; i < points.size(); i++) {
+                polylinePoint = points.get(i);
+                if (tapBounds.contains(polylinePoint)) {
+                  pointDistance = this.calculateDistance(point, polylinePoint);
+
+                  if (matches.containsKey(key)) {
+                    prevDistance = matches.get(key);
+                    if (pointDistance < prevDistance) {
+                      matches.put(key, pointDistance);
+                    }
+                  }
+                  else {
+                    matches.put(key, pointDistance);
+                  }
                 }
               }
             }
           }
         }
       }
+
+      // find the closest
+      HashMap.Entry<String, Double> min = null;
+      for (HashMap.Entry<String, Double> entry : matches.entrySet()) {
+        //key = entry.getKey();
+        //polyline = polylineClass.getPolyline(key);
+        //this.onPolylineClick(polyline, point);
+
+        if (min == null || min.getValue() > entry.getValue()) {
+          min = entry;
+        }
+      }
+
+      if (min != null) {
+        key = min.getKey();
+        polyline = polylineClass.getPolyline(key);
+        this.onPolylineClick(polyline, point);
+        hitPoly = true;
+      }
+
       if (hitPoly) {
         return;
       }
@@ -1595,6 +1632,39 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
       p0 = p1;
     }
     return false;
+  }
+
+  /**
+   * Check if two bounds overlap
+   * @param baseBounds
+   * @param testBounds
+   * @return
+   */
+  private boolean isBoundsOverlaps(LatLngBounds baseBounds, LatLngBounds testBounds) {
+    boolean latOverlaps = false;
+    boolean lngOverlaps = false;
+
+    if (testBounds.northeast.latitude < baseBounds.northeast.latitude && testBounds.northeast.latitude > baseBounds.southwest.latitude) {
+      latOverlaps = true;
+    }
+    else if (testBounds.southwest.latitude < baseBounds.northeast.latitude && testBounds.southwest.latitude > baseBounds.southwest.latitude) {
+      latOverlaps = true;
+    }
+    else if (testBounds.southwest.latitude < baseBounds.southwest.latitude && testBounds.northeast.latitude > baseBounds.northeast.latitude) {
+      latOverlaps = true;
+    }
+
+    if (testBounds.northeast.longitude < baseBounds.northeast.longitude && testBounds.northeast.longitude > baseBounds.southwest.longitude) {
+      lngOverlaps = true;
+    }
+    else if (testBounds.southwest.longitude < baseBounds.northeast.longitude && testBounds.southwest.longitude > baseBounds.southwest.longitude) {
+      lngOverlaps = true;
+    }
+    else if (testBounds.southwest.longitude < baseBounds.southwest.longitude && testBounds.northeast.longitude > baseBounds.northeast.longitude) {
+      lngOverlaps = true;
+    }
+
+    return latOverlaps && lngOverlaps;
   }
 
   /**
