@@ -15,16 +15,37 @@
   self.mapCtrl = viewCtrl;
 }
 
+-(GMSMutablePath *)decodeEncodedPath:(NSString *)encodedPath
+{
+  GMSMutablePath *path;
+  @try {
+    path = [GMSMutablePath pathFromEncodedPath:encodedPath];
+  }
+  @catch (NSException *exception) {
+    NSLog(@"Error creating path from encodedPath");
+    NSLog(@"%@", exception.reason);
+    path = [GMSMutablePath path];
+  }
+
+  return path;
+}
+
 -(NSMutableDictionary *)buildPolyline:(NSDictionary *)json
 {
-  GMSMutablePath *path = [GMSMutablePath path];
-
-  NSArray *points = [json objectForKey:@"points"];
-  int i = 0;
-  NSDictionary *latLng;
-  for (i = 0; i < points.count; i++) {
-    latLng = [points objectAtIndex:i];
-    [path addCoordinate:CLLocationCoordinate2DMake([[latLng objectForKey:@"lat"] floatValue], [[latLng objectForKey:@"lng"] floatValue])];
+  GMSMutablePath *path;
+  NSString *encodedPath = [json objectForKey:@"encodedPath"];
+  if ([encodedPath length] > 0) {
+    path = [self decodeEncodedPath:encodedPath];
+  }
+  else {
+    path = [GMSMutablePath path];
+    NSArray *points = [json objectForKey:@"points"];
+    int i = 0;
+    NSDictionary *latLng;
+    for (i = 0; i < points.count; i++) {
+      latLng = [points objectAtIndex:i];
+      [path addCoordinate:CLLocationCoordinate2DMake([[latLng objectForKey:@"lat"] floatValue], [[latLng objectForKey:@"lng"] floatValue])];
+    }
   }
 
   // Create the Polyline, and assign it to the map.

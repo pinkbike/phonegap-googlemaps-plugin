@@ -1,5 +1,7 @@
 package plugin.google.maps;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,18 +18,79 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
+
+  /**
+   * Decode an encoded polyline
+   * @param args
+   * @throws JSONException 
+   */
+  private static List<LatLng> decodeEncodedPath(String encodedPath) {
+    List<LatLng> poly = new ArrayList<LatLng>();
+
+    try {
+      int index = 0, len = encodedPath.length();
+      int lat = 0, lng = 0;
+
+      while (index < len) {
+        int b, shift = 0, result = 0;
+        do {
+          b = encodedPath.charAt(index++) - 63;
+          result |= (b & 0x1f) << shift;
+          shift += 5;
+        } while (b >= 0x20);
+        int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+        lat += dlat;
+
+        shift = 0;
+        result = 0;
+        do {
+          b = encodedPath.charAt(index++) - 63;
+          result |= (b & 0x1f) << shift;
+          shift += 5;
+        } while (b >= 0x20);
+        int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+        lng += dlng;
+
+        LatLng p = new LatLng(((double) lat / (double) 1E5), ((double) lng / (double) 1E5));
+        poly.add(p);
+        //poly.add(((double) lat / (double) 1E5));
+        //poly.add(((double) lng / (double) 1E5));
+      }
+    }
+    catch (Exception e) {
+      Log.w("GoogleMaps", "decodeEncodedPath error");
+    }
+
+    return poly;
+  }
+
   /**
    * Build polyline
    * @param args
    * @throws JSONException 
    */
   @SuppressWarnings("unused")
-  private JSONObject buildPolyline(final JSONObject opts) throws JSONException {
+  private JSONObject buildPolyline(final JSONArray opts) throws JSONException {
     final PolylineOptions polylineOptions = new PolylineOptions();
     int color;
     LatLngBounds.Builder builder = new LatLngBounds.Builder();
     
-    if (opts.has("points")) {
+    String encodedPath;
+    if (opts.has("encodedPath")) {
+      encodedPath = opts.getString("encodedPath");
+    }
+    else {
+      encodedPath = "";
+    }
+    if (encodedPath.length() > 0) {
+        List<LatLng> path = decodeEncodedPath(encodedPath);
+        int i = 0;
+        for (i = 0; i < path.size(); i++) {
+          polylineOptions.add(path.get(i));
+          builder.include(path.get(i));
+        }
+    }
+    else if (opts.has("points")) {
       JSONArray points = opts.getJSONArray("points");
       List<LatLng> path = PluginUtil.JSONArray2LatLngList(points);
       int i = 0;

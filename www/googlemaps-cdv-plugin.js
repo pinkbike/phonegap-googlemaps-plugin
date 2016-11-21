@@ -1152,6 +1152,7 @@ App.prototype.addPolylines = function(polylineOptionsArray, callback) {
 
     for (var i = 0; i < polylineOptionsArray.length; i++) {
       var polylineOptions = polylineOptionsArray[i];
+      polylineOptions.encodedPath = polylineOptions.encodedPath || "";
       polylineOptions.points = polylineOptions.points || [];
       polylineOptions.color = HTMLColor2RGBA(polylineOptions.color || "#FF000080", 0.75);
       polylineOptions.width = polylineOptions.width || 10;
@@ -1735,7 +1736,15 @@ Polyline.prototype.setPoints = function(points) {
     cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.setPoints', this.getId(), path]);
 };
 Polyline.prototype.getPoints = function() {
-    return this.get("points");
+    var points = this.get("points");
+    var encodedPath = this.get("encodedPath");
+
+    if ((!points || !points.length) && encodedPath) {
+      points = decodePath(encodedPath);
+      this.set('points', points);
+    }
+
+    return points;
 };
 Polyline.prototype.setColor = function(color) {
     this.set('color', color);
