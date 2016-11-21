@@ -217,11 +217,26 @@
       }
       [[UIScreen mainScreen] scale];
       
-      cameraBounds = [[GMSCoordinateBounds alloc] initWithPath:path];
-      //CLLocationCoordinate2D center = cameraBounds.center;
-      
-      cameraPosition = [self.mapCtrl.map cameraForBounds:cameraBounds insets:UIEdgeInsetsMake(10 * scale, 10* scale, 10* scale, 10* scale)];
-    
+      UIEdgeInsets padding;
+      if ([json objectForKey:@"padding"]) {
+        NSDictionary *paddingJson = [json objectForKey:@"padding"];
+        float top = [[paddingJson objectForKey:@"top"] floatValue];
+        float left = [[paddingJson objectForKey:@"left"] floatValue];
+        float right = [[paddingJson objectForKey:@"right"] floatValue];
+        float bottom = [[paddingJson objectForKey:@"bottom"] floatValue];
+
+        padding = UIEdgeInsetsMake(top, left, bottom, right);
+      }
+      else {
+        padding = UIEdgeInsetsMake(0,0,0,0);
+      }
+      padding.top    = padding.top    + 10 * scale;
+      padding.bottom = padding.bottom + 10 * scale;
+      padding.left   = padding.left   + 10 * scale;
+      padding.right  = padding.right  + 10 * scale;
+
+      GMSCoordinateBounds *bounds = [[GMSCoordinateBounds alloc] initWithPath:path];
+      cameraPosition = [self.mapCtrl.map cameraForBounds:bounds insets:padding];
     } else {
       latLng = [json objectForKey:@"target"];
       latitude = [[latLng valueForKey:@"lat"] floatValue];
