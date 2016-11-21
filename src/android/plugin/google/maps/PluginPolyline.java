@@ -89,7 +89,7 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
    * @throws JSONException 
    */
   @SuppressWarnings("unused")
-  private JSONObject buildPolyline(final JSONArray opts) throws JSONException {
+  private JSONObject buildPolyline(final JSONObject opts) throws JSONException {
     final PolylineOptions polylineOptions = new PolylineOptions();
     int color;
     LatLngBounds.Builder builder = new LatLngBounds.Builder();
