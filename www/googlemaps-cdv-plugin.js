@@ -1159,6 +1159,27 @@ App.prototype.addPolyline = function(polylineOptions, callback) {
         }
     }, self.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.createPolyline', self.deleteFromObject(polylineOptions,'function')]);
 };
+
+App.prototype.removePolylines = function(polylinesArray, callback) {
+  var ids = [];
+
+  for (var i = 0; i < polylinesArray.length; i++) {
+    var polyline =  polylinesArray[i];
+    ids.push(polyline.getId());
+  }
+
+  var self = this;
+  cordova.exec(function() {
+    if (typeof callback === "function") {
+      callback.call(self);
+    }
+  }, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.removeMultiple', ids]);
+
+  for (var i = 0; i < polylinesArray.length; i++) {
+    var polyline =  polylinesArray[i];
+    polyline.off();
+  }
+};
 //-------------
 // Polygon
 //-------------
@@ -1739,7 +1760,7 @@ Polyline.prototype.getZIndex = function() {
     return this.get('zIndex');
 };
 Polyline.prototype.remove = function() {
-    cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.remove', this.getId()]);
+    cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.removeMultiple', [this.getId()]]);
     this.off();
 };
 
