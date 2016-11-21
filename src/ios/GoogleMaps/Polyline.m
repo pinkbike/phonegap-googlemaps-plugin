@@ -15,8 +15,35 @@
   self.mapCtrl = viewCtrl;
 }
 
--(GMSMutablePath *)decodeEncodedPath:(NSString *)encodedPath
+-(GMSMutablePath *)decodeEncodedPath:(NSString *)obfuscatedPath
 {
+  double len = (double) [obfuscatedPath length];
+
+  NSString *encodedPath;
+
+  @try {
+    int chunkSize = 5;
+    int numChunks = (int) ceil(len/chunkSize);
+    int pos = len;
+    int start;
+    NSRange range;
+    NSString *chunk;
+    NSMutableArray *chunks = [NSMutableArray arrayWithCapacity:numChunks];
+    while (pos >= 0) {
+      start = MAX(pos-chunkSize, 0);
+      range = NSMakeRange(start, pos - start);
+      chunk = [obfuscatedPath substringWithRange:range];
+      [chunks addObject:chunk];
+      pos -= chunkSize;
+    }
+    encodedPath = [chunks componentsJoinedByString:@""];
+  }
+  @catch (NSException *exception) {
+    NSLog(@"Error parsing encrypted path");
+    NSLog(@"%@", exception.reason);
+    encodedPath = @"";
+  }
+
   GMSMutablePath *path;
   @try {
     path = [GMSMutablePath pathFromEncodedPath:encodedPath];

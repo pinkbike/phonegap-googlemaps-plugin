@@ -12,6 +12,8 @@ import org.json.JSONObject;
 
 import android.graphics.Color;
 
+import android.text.TextUtils;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polyline;
@@ -24,7 +26,24 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
    * @param args
    * @throws JSONException 
    */
-  private static List<LatLng> decodeEncodedPath(String encodedPath) {
+  private static List<LatLng> decodeEncodedPath(String obfuscatedPath) {
+    int encryptedPathLength = obfuscatedPath.length();
+    int chunkSize = 5;
+    int numChunks = (int) Math.ceil(encryptedPathLength/chunkSize) + 1;
+    int curChunk = 0;
+    int pos = encryptedPathLength;
+    int start;
+    String chunk;
+    String[] chunks = new String[numChunks];
+    while (pos >= 0) {
+      start = Math.max(pos-chunkSize, 0);
+      chunk = obfuscatedPath.substring(start, pos);
+      chunks[curChunk] = chunk;
+      pos -= chunkSize;
+      curChunk += 1;
+    }
+    String encodedPath = TextUtils.join("", chunks);
+
     List<LatLng> poly = new ArrayList<LatLng>();
 
     try {
