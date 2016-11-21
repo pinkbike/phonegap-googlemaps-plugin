@@ -97,6 +97,30 @@
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+-(void)decodePath:(CDVInvokedUrlCommand *)command
+{
+  NSString *encodedPath = [command.arguments objectAtIndex:1];
+  GMSMutablePath *path = [self decodeEncodedPath:encodedPath];
+  int numPoints = [path count];
+
+  NSMutableArray *latlngs = [NSMutableArray arrayWithCapacity:numPoints];
+
+  CLLocationCoordinate2D point;
+  NSMutableDictionary *latlng;
+  int i = 0;
+  for (i = 0; i < numPoints; i++) {
+    point = [path coordinateAtIndex:i];
+    latlng = [[NSMutableDictionary alloc] init];
+    [latlng setObject:@(point.latitude).stringValue forKey:@"lat"];
+    [latlng setObject:@(point.longitude).stringValue forKey:@"lng"];
+
+    [latlngs addObject:latlng];
+  }
+
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:latlngs];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 /**
  * Set points
  * @params key

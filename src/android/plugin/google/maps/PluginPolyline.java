@@ -157,6 +157,31 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
   }
 
   /**
+   * Decode encoded paths
+   * @param args
+   * @param callbackContext
+   * @throws JSONException
+   */
+  @SuppressWarnings("unused")
+  private void decodePath(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+    String encodedPath = args.getString(1);
+
+    JSONArray points = new JSONArray();
+    JSONObject point;
+    LatLng latlng;
+    List<LatLng> path = decodeEncodedPath(encodedPath);
+    int i = 0;
+    for (i = 0; i < path.size(); i++) {
+      point = new JSONObject();
+      latlng = path.get(i);
+      point.put("lat", Double.valueOf(latlng.latitude));
+      point.put("lng", Double.valueOf(latlng.longitude));
+      points.put(point);
+    }
+    callbackContext.success(points);
+  }
+
+  /**
    * Draw geodesic line 
    * @ref http://jamesmccaffrey.wordpress.com/2011/04/17/drawing-a-geodesic-line-for-bing-maps-ajax/
    * @ref http://spphire9.wordpress.com/2014/02/11/%E4%BA%8C%E6%AC%A1%E3%83%99%E3%82%B8%E3%82%A7%E6%9B%B2%E7%B7%9A%E3%81%A8%E7%B7%9A%E5%88%86%E3%81%AE%E5%BD%93%E3%81%9F%E3%82%8A%E5%88%A4%E5%AE%9A/

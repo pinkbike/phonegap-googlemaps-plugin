@@ -2646,6 +2646,15 @@ function decodePath(encoded, precision) {
     return array;
 }
 
+function decodePathNative(encodedPath, cb) {
+  cordova.exec(function(points) {
+    for (var i = 0; i < points.length; i++) {
+      points[i] = new LatLng(points[i].lat, points[i].lng);
+    }
+    cb(points);
+  }, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.decodePath', encodedPath]);
+}
+
 //encode functions
 function encodePath(points) {
     var plat = 0;
@@ -2743,6 +2752,7 @@ module.exports = {
     geometry: {
         encoding: {
             decodePath: decodePath,
+            decodePathNative: decodePathNative,
             encodePath: encodePath
         }
     }
