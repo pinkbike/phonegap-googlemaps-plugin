@@ -535,29 +535,37 @@ public class PluginMarker extends MyPlugin {
     Boolean isInfoWndShown = marker.isInfoWindowShown();
     callbackContext.success(isInfoWndShown ? 1 : 0);
   }
-  
+
   /**
-   * Remove the marker
+   * Remove markers
    * @param args
    * @param callbackContext
    * @throws JSONException 
    */
   @SuppressWarnings("unused")
-  private void remove(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-    String id = args.getString(1);
-    Marker marker = this.getMarker(id);
-    if (marker == null) {
-      callbackContext.success();
-      return;
+  private void removeMultiple(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+    JSONArray markerKeys = args.getJSONArray(1);
+
+    String id;
+    Marker marker;
+    int i;
+    for (i = 0; i < markerKeys.length(); i++) {
+      id = markerKeys.getString(i);
+      marker = this.getMarker(id);
+      if (marker == null) {
+        continue;
+      }
+      marker.remove();
+      this.objects.remove(id);
+
+      id = "marker_property_" + id;
+      this.objects.remove(id);
     }
-    marker.remove();
-    this.objects.remove(id);
-    
-    String propertyId = "marker_property_" + id;
-    this.objects.remove(propertyId);
-    this.sendNoResult(callbackContext);
+
+    //this.sendNoResult(callbackContext);
+    callbackContext.success(1);
   }
-  
+
   /**
    * Set anchor for the icon of the marker
    * @param args

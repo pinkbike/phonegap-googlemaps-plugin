@@ -1085,6 +1085,28 @@ App.prototype.addMarker = function(markerOptions, callback) {
     }, self.errorHandler, PLUGIN_NAME, 'exec', ['Marker.createMarker', self.deleteFromObject(markerOptions,'function')]);
 };
 
+App.prototype.removeMarkers = function(markersArray, callback) {
+  var ids = [];
+
+  for (var i = 0; i < markersArray.length; i++) {
+    var marker =  markersArray[i];
+    marker.set("keepWatching", false);
+    delete MARKERS[marker.id];
+    ids.push(marker.getId());
+  }
+
+  var self = this;
+  cordova.exec(function() {
+    if (typeof callback === "function") {
+        callback.call(self);
+    }
+  }, this.errorHandler, PLUGIN_NAME, 'exec', ['Marker.removeMultiple', ids]);
+
+  for (var i = 0; i < markersArray.length; i++) {
+    var marker =  markersArray[i];
+    marker.off();
+  }
+};
 
 //-------------
 // Circle
@@ -1424,7 +1446,7 @@ Marker.prototype.remove = function(callback) {
         if (typeof callback === "function") {
             callback.call(self);
         }
-    }, this.errorHandler, PLUGIN_NAME, 'exec', ['Marker.remove', this.getId()]);
+    }, this.errorHandler, PLUGIN_NAME, 'exec', ['Marker.removeMultiple', [this.getId()]]);
     this.off();
 };
 Marker.prototype.setDisableAutoPan = function(disableAutoPan) {
