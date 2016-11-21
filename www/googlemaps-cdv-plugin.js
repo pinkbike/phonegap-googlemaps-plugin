@@ -1139,25 +1139,40 @@ App.prototype.addCircle = function(circleOptions, callback) {
 // Polyline
 //-------------
 App.prototype.addPolyline = function(polylineOptions, callback) {
-    var self = this;
-    polylineOptions.points = polylineOptions.points || [];
-    polylineOptions.color = HTMLColor2RGBA(polylineOptions.color || "#FF000080", 0.75);
-    polylineOptions.width = polylineOptions.width || 10;
-    polylineOptions.visible = polylineOptions.visible === undefined ? true : polylineOptions.visible;
-    polylineOptions.zIndex = polylineOptions.zIndex || 4;
-    polylineOptions.geodesic = polylineOptions.geodesic  === true;
-    polylineOptions.tappable = polylineOptions.tappable === undefined ? true : polylineOptions.tappable;
-
-    cordova.exec(function(result) {
-        var polyline = new Polyline(self, result.id, polylineOptions);
-        OVERLAYS[result.id] = polyline;
-        /*if (typeof polylineOptions.onClick === "function") {
-          polyline.on(plugin.google.maps.event.OVERLAY_CLICK, polylineOptions.onClick);
-        }*/
+    this.addPolylines([polylineOptions], function(polylines) {
+        var polyline = polylines[0];
         if (typeof callback === "function") {
             callback.call(self, polyline, self);
         }
-    }, self.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.createPolyline', self.deleteFromObject(polylineOptions,'function')]);
+    });
+};
+
+App.prototype.addPolylines = function(polylineOptionsArray, callback) {
+    var self = this;
+
+    for (var i = 0; i < polylineOptionsArray.length; i++) {
+      var polylineOptions = polylineOptionsArray[i];
+      polylineOptions.points = polylineOptions.points || [];
+      polylineOptions.color = HTMLColor2RGBA(polylineOptions.color || "#FF000080", 0.75);
+      polylineOptions.width = polylineOptions.width || 10;
+      polylineOptions.visible = polylineOptions.visible === undefined ? true : polylineOptions.visible;
+      polylineOptions.zIndex = polylineOptions.zIndex || 4;
+      polylineOptions.geodesic = polylineOptions.geodesic  === true;
+      polylineOptions.tappable = polylineOptions.tappable === undefined ? true : polylineOptions.tappable;
+    }
+
+    cordova.exec(function(results) {
+        var polylines = [];
+        for (var i = 0; i < results.length; i++) {
+          var polyline = new Polyline(self, results[i].id, polylineOptionsArray[i]);
+          OVERLAYS[results[i].id] = polyline;
+          polylines.push(polyline);
+        }
+
+        if (typeof callback === "function") {
+            callback.call(self, polylines, self);
+        }
+    }, self.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.createPolylines', self.deleteFromObject(polylineOptionsArray,'function')]);
 };
 
 App.prototype.removePolylines = function(polylinesArray, callback) {

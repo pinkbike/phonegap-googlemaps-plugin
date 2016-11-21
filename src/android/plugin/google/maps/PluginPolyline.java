@@ -17,18 +17,16 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
   /**
-   * Create polyline
+   * Build polyline
    * @param args
-   * @param callbackContext
    * @throws JSONException 
    */
   @SuppressWarnings("unused")
-  private void createPolyline(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+  private JSONObject buildPolyline(final JSONObject opts) throws JSONException {
     final PolylineOptions polylineOptions = new PolylineOptions();
     int color;
     LatLngBounds.Builder builder = new LatLngBounds.Builder();
     
-    JSONObject opts = args.getJSONObject(1);
     if (opts.has("points")) {
       JSONArray points = opts.getJSONArray("points");
       List<LatLng> path = PluginUtil.JSONArray2LatLngList(points);
@@ -69,9 +67,32 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     JSONObject result = new JSONObject();
     result.put("hashCode", polyline.hashCode());
     result.put("id", id);
-    callbackContext.success(result);
+
+    return result;
   }
   
+  /**
+   * Create polylines
+   * @param args
+   * @param callbackContext
+   * @throws JSONException 
+   */
+  @SuppressWarnings("unused")
+  private void createPolylines(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+    JSONArray polylinesOptionsArray = args.getJSONArray(1);
+
+    JSONArray polylines = new JSONArray();
+    JSONObject opts;
+    JSONObject result;
+    int i;
+    for (i = 0; i < polylinesOptionsArray.length(); i++) {
+      opts = polylinesOptionsArray.getJSONObject(i);
+      result = this.buildPolyline(opts);
+      polylines.put(result);
+    }
+    callbackContext.success(polylines);
+  }
+
   /**
    * Draw geodesic line 
    * @ref http://jamesmccaffrey.wordpress.com/2011/04/17/drawing-a-geodesic-line-for-bing-maps-ajax/

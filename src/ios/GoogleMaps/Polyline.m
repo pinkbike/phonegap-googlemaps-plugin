@@ -15,9 +15,8 @@
   self.mapCtrl = viewCtrl;
 }
 
--(void)createPolyline:(CDVInvokedUrlCommand *)command
+-(NSMutableDictionary *)buildPolyline:(NSDictionary *)json
 {
-  NSDictionary *json = [command.arguments objectAtIndex:1];
   GMSMutablePath *path = [GMSMutablePath path];
 
   NSArray *points = [json objectForKey:@"points"];
@@ -58,11 +57,24 @@
   [result setObject:id forKey:@"id"];
   [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)polyline.hash] forKey:@"hashCode"];
 
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
-  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+  return result;
 }
 
+-(void)createPolylines:(CDVInvokedUrlCommand *)command
+{
+  NSArray *polylinesOptionsArray = [command.arguments objectAtIndex:1];
+  NSInteger numItems = [polylinesOptionsArray count];
+  NSMutableArray *polylines = [NSMutableArray arrayWithCapacity:numItems];
 
+  NSMutableDictionary *result;
+  for (NSDictionary *json in polylinesOptionsArray) {
+    result = [self buildPolyline:json];
+    [polylines addObject:result];
+  }
+
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:polylines];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
 
 /**
  * Set points
