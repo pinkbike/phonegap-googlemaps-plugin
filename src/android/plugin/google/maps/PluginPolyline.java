@@ -349,7 +349,7 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
       polyline.remove();
     }
 
-    this.sendNoResult(callbackContext);
+    callbackContext.success(1);
   }
 
   /**
