@@ -56,6 +56,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
+import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener
 import com.google.android.gms.maps.GoogleMap.OnIndoorStateChangeListener;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
@@ -102,7 +103,7 @@ import java.util.Set;
 @SuppressWarnings("deprecation")
 public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, OnMarkerClickListener,
       OnInfoWindowClickListener, OnMapClickListener, OnMapLongClickListener,
-      OnCameraChangeListener, OnMapLoadedCallback, OnMarkerDragListener,
+      OnCameraChangeListener, OnCameraMoveStartedListener, OnMapLoadedCallback, OnMarkerDragListener,
       OnMyLocationButtonClickListener, OnIndoorStateChangeListener, InfoWindowAdapter, ViewTreeObserver.OnScrollChangedListener {
   private final String TAG = "GoogleMapsPlugin";
   public final HashMap<String, PluginEntry> plugins = new HashMap<String, PluginEntry>();
@@ -579,6 +580,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
 
           // Set event listener
           map.setOnCameraChangeListener(GoogleMaps.this);
+          map.setOnCameraMoveStartedListener(GoogleMaps.this);
           map.setOnInfoWindowClickListener(GoogleMaps.this);
           map.setOnMapClickListener(GoogleMaps.this);
           map.setOnMapLoadedCallback(GoogleMaps.this);
@@ -1775,6 +1777,21 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
       e.printStackTrace();
     }
     webView.loadUrl("javascript:plugin.google.maps.Map._onCameraEvent('camera_change', " + jsonStr + ")");
+  }
+
+  /**
+   * Notify the camera move start event to JS
+   */
+  @Override
+  public void onCameraMoveStarted(int reason) {
+    JSONObject params = new JSONObject();
+    String jsonStr = "";
+    String drag = "false";
+
+    if (reason == OnCameraMoveStartedListener.REASON_GESTURE) {
+      drag = "true";
+    }
+    webView.loadUrl("javascript:plugin.google.maps.Map._onMapEvent('will_move', " + drag + ")");
   }
 
   @Override
