@@ -85,6 +85,11 @@
         [iconProperty setObject:[rgbColor parsePluginColor] forKey:@"iconColor"];
     }
 
+    if ([json valueForKey:@"anchor"]) {
+      NSArray *points = [json valueForKey:@"anchor"];
+      [iconProperty setObject:points forKey:@"anchor"];
+    }
+
     // Visible property
     if ([[json valueForKey:@"visible"] boolValue] == true) {
         iconProperty[@"visible"] = @YES;
