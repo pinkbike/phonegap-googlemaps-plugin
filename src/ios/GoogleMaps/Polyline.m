@@ -17,11 +17,10 @@
 
 -(GMSMutablePath *)decodeEncodedPath:(NSString *)obfuscatedPath
 {
-  double len = (double) [obfuscatedPath length];
-
   NSString *encodedPath;
-
   @try {
+    double len = (double) [obfuscatedPath length];
+
     int chunkSize = 5;
     int numChunks = (int) ceil(len/chunkSize);
     int pos = len;

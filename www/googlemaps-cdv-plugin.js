@@ -2652,7 +2652,7 @@ function decodePathNative(encodedPath, cb) {
       points[i] = new LatLng(points[i].lat, points[i].lng);
     }
     cb(points);
-  }, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.decodePath', encodedPath]);
+  }, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.decodePath', encodedPath || ""]);
 }
 
 //encode functions
