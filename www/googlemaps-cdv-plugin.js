@@ -1687,7 +1687,7 @@ Polyline.prototype.getId = function() {
     return this.id;
 };
 
-Polyline.prototype.setPoints = function(points) {
+Polyline.prototype.setPoints = function(points, callback) {
     this.set('points', points);
     var i,
         path = [];
@@ -1697,7 +1697,9 @@ Polyline.prototype.setPoints = function(points) {
             "lng": points[i].lng
         });
     }
-    cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.setPoints', this.getId(), path]);
+    cordova.exec(function() {
+        callback.call();
+    }, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.setPoints', this.getId(), path]);
 };
 Polyline.prototype.getPoints = function() {
     return this.get("points");
