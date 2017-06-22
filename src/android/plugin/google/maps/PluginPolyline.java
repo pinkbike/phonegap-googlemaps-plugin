@@ -392,7 +392,8 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     }
     this.objects.put("polyline_bounds_" + polyline.getId(), builder.build());
 
-    this.sendNoResult(callbackContext);
+    //this.sendNoResult(callbackContext);
+    callbackContext.success(1);
   }
   /**
    * set geodesic
