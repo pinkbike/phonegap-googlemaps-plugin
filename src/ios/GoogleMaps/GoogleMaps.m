@@ -264,12 +264,12 @@
                     pluginClass.commandDelegate = self.commandDelegate;
                     [pluginClass setGoogleMapsViewController:self.mapCtrl];
 
-                    // debugging to track down crash
-                    NSLog(@"-->className=%@", className);
-                    NSError *error = [NSError errorWithDomain:@"com.pinkbike.trailforks" code:1 userInfo:nil];
-                    NSDictionary *debugInfo = @{@"className": className, @"method": methodName};
-                    [CrashlyticsKit recordError:error withAdditionalUserInfo:userInfo];
-                    // end debugging
+                    // // debugging to track down crash
+                    // NSLog(@"-->className=%@", className);
+                    // NSError *error = [NSError errorWithDomain:@"com.pinkbike.trailforks" code:1 userInfo:nil];
+                    // NSDictionary *debugInfo = @{@"className": className, @"method": methodName};
+                    // [CrashlyticsKit recordError:error withAdditionalUserInfo:userInfo];
+                    // // end debugging
 
                     [self.mapCtrl.plugins setObject:pluginClass forKey:className];
                 }
