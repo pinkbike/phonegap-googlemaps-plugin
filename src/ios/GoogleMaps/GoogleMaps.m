@@ -236,6 +236,9 @@
 
         NSArray *target = [classAndMethod componentsSeparatedByString:@"."];
         NSString *className = [target objectAtIndex:0];
+        if ([className isEqualToString:@"Polyline"]) {
+          className = @"GMPolyline";
+        }
         CDVPlugin<MyPlgunProtocol> *pluginClass = nil;
         NSString *methodName;
         if (self.mapCtrl.debuggable) {

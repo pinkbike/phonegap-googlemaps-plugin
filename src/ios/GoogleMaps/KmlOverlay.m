@@ -424,7 +424,7 @@
             [tagName isEqualToString:@"polygon"]) {
 
             if ([tagName isEqualToString:@"linestring"]) {
-                targetClass = @"Polyline";
+                targetClass = @"GMPolyline";
                 [*options setObject :[NSNumber numberWithInt:4] forKey : @"zIndex"];
             } else {
                 targetClass = @"Polygon";
@@ -475,7 +475,7 @@
         [self _applyStyleTag:style options:options targetClass:targetClass];
     }
 
-    if ([targetClass isEqualToString:@"Polyline"] ||
+    if ([targetClass isEqualToString:@"GMPolyline"] ||
         [targetClass isEqualToString:@"Polygon"]) {
         //------------------------------
         // Create a polyline or polygon

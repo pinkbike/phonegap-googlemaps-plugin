@@ -140,8 +140,8 @@
             <feature name="Polygon">
                 <param name="ios-package" value="Polygon" />
             </feature>
-            <feature name="Polyline">
-                <param name="ios-package" value="Polyline" />
+            <feature name="GMPolyline">
+                <param name="ios-package" value="GMPolyline" />
             </feature>
             <feature name="TileOverlay">
                 <param name="ios-package" value="TileOverlay" />
@@ -171,8 +171,8 @@
         <source-file src="src/ios/GoogleMaps/PluginUtil.m" />
         <header-file src="src/ios/GoogleMaps/Polygon.h" />
         <source-file src="src/ios/GoogleMaps/Polygon.m" />
-        <header-file src="src/ios/GoogleMaps/Polyline.h" />
-        <source-file src="src/ios/GoogleMaps/Polyline.m" />
+        <header-file src="src/ios/GoogleMaps/GMPolyline.h" />
+        <source-file src="src/ios/GoogleMaps/GMPolyline.m" />
         <header-file src="src/ios/GoogleMaps/TBXML.h" />
         <source-file src="src/ios/GoogleMaps/TBXML.m" />
         <header-file src="src/ios/GoogleMaps/TileOverlay.h" />

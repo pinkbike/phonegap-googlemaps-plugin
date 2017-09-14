@@ -1,14 +1,14 @@
 //
-//  Polyline.m
+//  GMPolyline.m
 //  SimpleMap
 //
 //  Created by masashi on 11/14/13.
 //
 //
 
-#import "Polyline.h"
+#import "GMPolyline.h"
 
-@implementation Polyline
+@implementation GMPolyline
 
 -(void)setGoogleMapsViewController:(GoogleMapsViewController *)viewCtrl
 {
@@ -74,7 +74,7 @@
     }
   }
 
-  // Create the Polyline, and assign it to the map.
+  // Create the GMPolyline, and assign it to the map.
   GMSPolyline *polyline = [GMSPolyline polylineWithPath:path];
 
   if ([[json valueForKey:@"visible"] boolValue]) {
