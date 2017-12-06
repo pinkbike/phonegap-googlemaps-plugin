@@ -212,21 +212,6 @@
           </array>
         </config-file>
 
-        <config-file target="*-Info.plist" parent="CFBundleURLTypes">
-          <array>
-            <dict>
-              <key>CFBundleTypeRole</key>
-              <string>Editor</string>
-              <key>CFBundleURLName</key>
-              <string>$PACKAGE_NAME</string>
-              <key>CFBundleURLSchemes</key>
-              <array>
-                <string>$PACKAGE_NAME</string>
-              </array>
-            </dict>
-          </array>
-        </config-file>
-
         <dependency id="com.googlemaps.ios" url="https://github.com/mapsplugin/cordova-plugin-googlemaps-sdk" branch="master"  />
     </platform>
 </plugin>
