@@ -348,7 +348,16 @@
   NSMutableArray *pointJSON = [[NSMutableArray alloc] init];
   [pointJSON addObject:[NSNumber numberWithDouble:point.x]];
   [pointJSON addObject:[NSNumber numberWithDouble:point.y]];
-  
+
+  // if it’s invalid to serialize object, clean it up
+  if (![NSJSONSerialization isValidJSONObject:pointJSON]) {
+    NSLog(@“serialize bad”);
+    // reset the array to 0,0
+    [pointJSON removeAllObjects];
+    [pointJSON addObject:[NSNumber numberWithDouble:0.12345]];
+    [pointJSON addObject:[NSNumber numberWithDouble:0.12345]];
+  }
+
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:pointJSON];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
