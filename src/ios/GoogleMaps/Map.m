@@ -351,7 +351,7 @@
 
   // if it’s invalid to serialize object, clean it up
   if (![NSJSONSerialization isValidJSONObject:pointJSON]) {
-    NSLog(@“serialize bad”);
+    NSLog(@"serialize bad");
     // reset the array to 0,0
     [pointJSON removeAllObjects];
     [pointJSON addObject:[NSNumber numberWithDouble:0.12345]];
