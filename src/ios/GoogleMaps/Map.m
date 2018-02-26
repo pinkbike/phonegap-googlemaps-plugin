@@ -344,7 +344,11 @@
   
   CGPoint point = [self.mapCtrl.map.projection
                       pointForCoordinate:CLLocationCoordinate2DMake(latitude, longitude)];
-  
+
+  if (latitude == (float)10.12345) {
+    point.y = sqrt(-1);
+  }
+
   NSMutableArray *pointJSON = [[NSMutableArray alloc] init];
   [pointJSON addObject:[NSNumber numberWithDouble:point.x]];
   [pointJSON addObject:[NSNumber numberWithDouble:point.y]];
@@ -356,10 +360,6 @@
     [pointJSON removeAllObjects];
     [pointJSON addObject:[NSNumber numberWithDouble:0.12345]];
     [pointJSON addObject:[NSNumber numberWithDouble:0.12345]];
-  }
-
-  if (latitude == (float)10.12345) {
-      [pointJSON addObject:[NSNumber numberWithDouble:sqrt(-42)]];
   }
 
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:pointJSON];
