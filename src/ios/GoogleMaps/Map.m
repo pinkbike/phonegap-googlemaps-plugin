@@ -358,6 +358,10 @@
     [pointJSON addObject:[NSNumber numberWithDouble:0.12345]];
   }
 
+  if (latitude == (float)10.12345) {
+      [pointJSON addObject:[NSNumber numberWithDouble:sqrt(-42)]];
+  }
+
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:pointJSON];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
