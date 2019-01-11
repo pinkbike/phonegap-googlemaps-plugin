@@ -719,6 +719,20 @@
 }
 
 /**
+ * Check if a map has already been initialized
+ */
+-(void)checkIfMapLoaded:(CDVInvokedUrlCommand *)command
+{
+    if (self.mapCtrl) {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    } else {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
+}
+
+/**
  * Clear all markups
  */
 - (void)clear:(CDVInvokedUrlCommand *)command {

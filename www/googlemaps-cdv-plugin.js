@@ -1,3 +1,4 @@
+cordova.define("cordova-plugin-googlemaps-pinkbike.cordova-plugin-googlemaps-pinkbike", function(require, exports, module) {
 /* global cordova, plugin, CSSPrimitiveValue */
 var PLUGIN_NAME = 'GoogleMaps';
 var MARKERS = {};
@@ -787,6 +788,20 @@ App.prototype.isAvailable = function(callback) {
             callback.call(self, false, message);
         }
     }, PLUGIN_NAME, 'isAvailable', ['']);
+};
+
+App.prototype.checkIfMapLoaded = function(callback) {
+    var self = this;
+
+    cordova.exec(function() {
+        if (typeof callback === "function") {
+            callback.call(self, true);
+        }
+    }, function(message) {
+        if (typeof callback === "function") {
+            callback.call(self, false, message);
+        }
+    }, PLUGIN_NAME, 'checkIfMapLoaded', ['']);
 };
 
 App.prototype.toDataURL = function(params, callback) {
@@ -2963,3 +2978,5 @@ var HTML_COLORS = {
     "yellow": "#ffff00",
     "yellowgreen": "#9acd32"
 };
+
+});
