@@ -1,4 +1,3 @@
-cordova.define("cordova-plugin-googlemaps-pinkbike.cordova-plugin-googlemaps-pinkbike", function(require, exports, module) {
 /* global cordova, plugin, CSSPrimitiveValue */
 var PLUGIN_NAME = 'GoogleMaps';
 var MARKERS = {};
@@ -2978,5 +2977,3 @@ var HTML_COLORS = {
     "yellow": "#ffff00",
     "yellowgreen": "#9acd32"
 };
-
-});
