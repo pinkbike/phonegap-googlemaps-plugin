@@ -453,6 +453,8 @@
     [self.pluginLayer clearHTMLElement];
     [self.pluginScrollView.debugView clearHTMLElement];
 
+    self.pluginScrollView.bounds = self.pluginScrollView.frame;
+
     NSArray *HTMLs = [command.arguments objectAtIndex:(argCnt - 1)];
     NSString *elemId;
     NSDictionary *elemSize, *elemInfo;
