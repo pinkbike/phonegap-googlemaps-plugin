@@ -43,6 +43,10 @@ var BaseClass = function() {
     };
 
     self.trigger = function(eventName) {
+        if (eventName === "click") {
+            eventName = "SYNTHETIC_click";
+        }
+
         var args = [];
         for (var i = 1; i < arguments.length; i++) {
             args.push(arguments[i]);
@@ -54,6 +58,10 @@ var BaseClass = function() {
         document.dispatchEvent(event);
     };
     self.on = function(eventName, callback) {
+        if (eventName === "click") {
+            eventName = "SYNTHETIC_click";
+        }
+
         _listeners[eventName] = _listeners[eventName] || [];
 
         var listener = function(e) {
@@ -71,6 +79,10 @@ var BaseClass = function() {
     self.addEventListener = self.on;
 
     self.off = function(eventName, callback) {
+        if (eventName === "click") {
+            eventName = "SYNTHETIC_click";
+        }
+
         var i;
         if (typeof eventName === "string") {
             if (eventName in _listeners) {
@@ -95,6 +107,10 @@ var BaseClass = function() {
             var eventNames = Object.keys(_listeners);
             for (i = 0; i < eventNames.length; i++) {
                 eventName = eventNames[i];
+                if (eventName === "click") {
+                    eventName = "SYNTHETIC_click";
+                }
+
                 if ( eventName !== 'keepWatching_changed' ) {
                     for (var j = 0; j < _listeners[eventName].length; j++) {
                         document.removeEventListener(eventName, _listeners[eventName][j].listener);
@@ -110,6 +126,10 @@ var BaseClass = function() {
 
 
     self.one = function(eventName, callback) {
+        if (eventName === "click") {
+            eventName = "SYNTHETIC_click";
+        }
+
         _listeners[eventName] = _listeners[eventName] || [];
 
         var listener = function(e) {
