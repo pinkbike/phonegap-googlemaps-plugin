@@ -93,7 +93,9 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     final PolylineOptions polylineOptions = new PolylineOptions();
     int color;
     LatLngBounds.Builder builder = new LatLngBounds.Builder();
-    
+    LatLng startCoord = new LatLng(0,0);
+    LatLng endCoord = new LatLng(0,0);
+
     String encodedPath;
     if (opts.has("encodedPath")) {
       encodedPath = opts.getString("encodedPath");
@@ -108,6 +110,8 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
           polylineOptions.add(path.get(i));
           builder.include(path.get(i));
         }
+        startCoord = path.get(0);
+        endCoord = path.get(path.size()-1);
     }
     else if (opts.has("points")) {
       JSONArray points = opts.getJSONArray("points");
@@ -117,6 +121,8 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
         polylineOptions.add(path.get(i));
         builder.include(path.get(i));
       }
+      startCoord = path.get(0);
+      endCoord = path.get(path.size()-1);
     }
     if (opts.has("color")) {
       color = PluginUtil.parsePluginColor(opts.getJSONArray("color"));
@@ -149,6 +155,16 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     JSONObject result = new JSONObject();
     result.put("hashCode", polyline.hashCode());
     result.put("id", id);
+
+    JSONObject startLatLng = new JSONObject();
+    startLatLng.put("lat", startCoord.latitude);
+    startLatLng.put("lng", startCoord.longitude);
+    result.put("startLatLng", startLatLng);
+
+    JSONObject endLatLng = new JSONObject();
+    endLatLng.put("lat", endCoord.latitude);
+    endLatLng.put("lng", endCoord.longitude);
+    result.put("endLatLng", endLatLng);
 
     return result;
   }

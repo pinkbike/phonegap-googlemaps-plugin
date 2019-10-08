@@ -104,6 +104,18 @@
   [result setObject:id forKey:@"id"];
   [result setObject:[NSString stringWithFormat:@"%lu", (unsigned long)polyline.hash] forKey:@"hashCode"];
 
+  NSMutableDictionary *startLatLng = [NSMutableDictionary dictionary];
+  CLLocationCoordinate2D startCoord = [path coordinateAtIndex:0];
+  [startLatLng setObject:[NSNumber numberWithFloat:startCoord.latitude] forKey:@"lat"];
+  [startLatLng setObject:[NSNumber numberWithFloat:startCoord.longitude] forKey:@"lng"];
+  [result setObject:startLatLng forKey:@"startLatLng"];
+
+  NSMutableDictionary *endLatLng = [NSMutableDictionary dictionary];
+  CLLocationCoordinate2D endCoord = [path coordinateAtIndex:([path count]-1)];
+  [endLatLng setObject:[NSNumber numberWithFloat:endCoord.latitude] forKey:@"lat"];
+  [endLatLng setObject:[NSNumber numberWithFloat:endCoord.longitude] forKey:@"lng"];
+  [result setObject:endLatLng forKey:@"endLatLng"];
+
   return result;
 }
 

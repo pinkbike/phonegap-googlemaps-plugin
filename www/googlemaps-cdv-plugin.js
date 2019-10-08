@@ -1202,6 +1202,19 @@ App.prototype.addPolylines = function(polylineOptionsArray, callback) {
           var polyline = new Polyline(self, results[i].id, polylineOptionsArray[i]);
           OVERLAYS[results[i].id] = polyline;
           polylines.push(polyline);
+          
+          if (polylineOptionsArray[i].startMarker && results[i].startLatLng) {
+            polylineOptionsArray[i].startMarker.position = results[i].startLatLng;
+            self.addMarker(polylineOptionsArray[i].startMarker, function(marker) {
+                polyline.set('startMarkerObj', marker);
+            });
+          }
+          if (polylineOptionsArray[i].endMarker && results[i].endLatLng) {
+            polylineOptionsArray[i].endMarker.position = results[i].endLatLng;
+            self.addMarker(polylineOptionsArray[i].endMarker, function(marker) {
+                polyline.set('endMarkerObj', marker);
+            });
+          }
         }
 
         if (typeof callback === "function") {
@@ -1224,6 +1237,11 @@ App.prototype.removePolylines = function(polylinesArray, callback) {
       callback.call(self);
     }
   }, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.removeMultiple', ids]);
+
+  for (var i = 0; i < polylinesArray.length; i++) {
+    var polyline =  polylinesArray[i];
+    polyline.removeMarkers();
+  }
 
   for (var i = 0; i < polylinesArray.length; i++) {
     var polyline =  polylinesArray[i];
@@ -1757,6 +1775,19 @@ Polyline.prototype.getId = function() {
     return this.id;
 };
 
+Polyline.prototype.removeMarkers = function() {
+    console.log('Polyline.prototype.removeMarkers');
+    var start = this.get("startMarkerObj");
+    if (start) {
+        start.remove();
+    }
+    
+    var end = this.get("endMarkerObj");
+    if  (end) {
+        end.remove();
+    }
+};
+
 Polyline.prototype.setPoints = function(points, callback) {
     var self = this;
     this.set('points', points);
@@ -1825,6 +1856,7 @@ Polyline.prototype.getZIndex = function() {
 Polyline.prototype.remove = function() {
     cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'exec', ['Polyline.removeMultiple', [this.getId()]]);
     this.off();
+    this.removeMarkers();
 };
 
 Polyline.prototype.getMap = function() {
